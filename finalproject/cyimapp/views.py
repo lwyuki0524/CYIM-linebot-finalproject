@@ -30,7 +30,7 @@ def callback(request):
             return HttpResponseBadRequest()
         
         columns=[]
-        domain = 'https://e0ea1b83be51.ngrok.io'+'/' #網域
+        domain = 'https://9944aad41311.ngrok.io'+'/' #網域
         
         for event in events:
             if isinstance(event, MessageEvent):
@@ -56,7 +56,7 @@ def callback(request):
                     
                     ##隨機抽五筆資料
                     carousel_template_message = TemplateSendMessage(alt_text='Carousel template',
-                                                                    template=CarouselTemplate(columns=sample(columns, 5)))
+                                                                    template=CarouselTemplate(columns=columns))
                     line_bot_api.reply_message(event.reply_token, carousel_template_message)
                         
                 else:
