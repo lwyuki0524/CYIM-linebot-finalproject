@@ -1,0 +1,1 @@
+views.py裡的domain要改成ngrok的網域(跟line一樣)
