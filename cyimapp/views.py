@@ -36,7 +36,7 @@ def callback(request):
             return HttpResponseBadRequest()
         
         columns=[]
-        domain = 'https://cyim-finalproject.herokuapp.com'+'/' #網域
+        domain = 'https://res.cloudinary.com/lwyuki/image/upload/v1'+'/' #網域
         
         for event in events:
             if isinstance(event, MessageEvent):
