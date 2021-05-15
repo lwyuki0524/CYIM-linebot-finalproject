@@ -18,7 +18,7 @@ line_bot_api = LineBotApi(settings.LINE_CHANNEL_ACCESS_TOKEN)
 parser = WebhookParser(settings.LINE_CHANNEL_SECRET)
 
 
-def listall(request):
+def listfoodTable(request):
     allfoods = foodTable.objects.all().order_by('id')
     return render(request, "listfoodTable.html", locals())
 
