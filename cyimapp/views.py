@@ -17,12 +17,6 @@ line_bot_api = LineBotApi(settings.LINE_CHANNEL_ACCESS_TOKEN)
 parser = WebhookParser(settings.LINE_CHANNEL_SECRET)
 
 
-def listfoodTable(request):
-    allfoods = foodTable.objects.all().order_by('id')
-    return render(request, "listfoodTable.html", locals())
-
-
-
 @csrf_exempt
 def callback(request):
     if request.method == 'POST':
@@ -36,43 +30,37 @@ def callback(request):
             return HttpResponseBadRequest()
         
         columns=[]
-        domain = 'https://cyim-finalproject.herokuapp.com'+'/' #網域
+        domain = 'https://9944aad41311.ngrok.io'+'/' #網域
         
         for event in events:
             if isinstance(event, MessageEvent):
                 
-                #讀取資料庫的foodTable
-                if event.message.text=="/read foodTable" :
-                    line_bot_api.reply_message(event.reply_token,TextSendMessage(
-                        text='https://liff.line.me/'+'1655990146-npeZ9k20') )
-                else:
-                    
-                    #將用戶傳的文字擷取ftag關鍵字
-                    filter_text = " "
-                    food_entry_list = list(foodTable.objects.all())  #先列出所有食物物件
-                    #從物件中一一取出fTag來比對使用者的文字
-                    for food_item in food_entry_list:  
-                        if food_item.fTag in event.message.text:
-                            print(event.message.text +" find "+ food_item.fTag)
-                            filter_text = food_item.fTag
-                            
-                    
-                    unit = foodTable.objects.filter( fTag = filter_text ) #過濾資料
-                    if unit.exists():
-                        print(unit)
-                        for item in unit :
-                            url = domain+parse.quote(str(item.fMenuImage).encode('utf-8'))
-                            print(url)
-                            message = replyCarousel.CarouselReply(item.fUrl,url,item.fName,item.fAddress )
-                            columns.append(message)
+                #將用戶傳的文字擷取ftag關鍵字
+                filter_text = " "
+                food_entry_list = list(foodTable.objects.all())  #先列出所有食物物件
+                #從物件中一一取出fTag來比對使用者的文字
+                for food_item in food_entry_list:  
+                    if food_item.fTag in event.message.text:
+                        print(event.message.text +" find "+ food_item.fTag)
+                        filter_text = food_item.fTag
                         
-                        ##隨機抽五筆資料
-                        carousel_template_message = TemplateSendMessage(alt_text='Carousel template',
-                                                                        template=CarouselTemplate(columns=columns))
-                        line_bot_api.reply_message(event.reply_token, carousel_template_message)
-                            
-                    else:
-                        line_bot_api.reply_message(event.reply_token,TextSendMessage(text = event.message.text) )
+                
+                unit = foodTable.objects.filter( fTag = filter_text ) #過濾資料
+                if unit.exists():
+                    print(unit)
+                    for item in unit :
+                        url = domain+parse.quote(str(item.fMenuImage).encode('utf-8'))
+                        print(url)
+                        message = replyCarousel.CarouselReply(item.fUrl,url,item.fName,item.fAddress )
+                        columns.append(message)
+                    
+                    ##隨機抽五筆資料
+                    carousel_template_message = TemplateSendMessage(alt_text='Carousel template',
+                                                                    template=CarouselTemplate(columns=columns))
+                    line_bot_api.reply_message(event.reply_token, carousel_template_message)
+                        
+                else:
+                    line_bot_api.reply_message(event.reply_token,TextSendMessage(text = event.message.text) )
             
         return HttpResponse()
     else:
