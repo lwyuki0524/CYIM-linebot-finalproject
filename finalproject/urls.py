@@ -16,14 +16,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.conf.urls import url
-from cyimapp.views import callback,listfoodTable
+from cyimapp.views import callback
 from django.conf.urls.static import static
 #from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     url('^callback',callback),
-    url(r'^listfoodTable$', listfoodTable),
 
 ]
 
