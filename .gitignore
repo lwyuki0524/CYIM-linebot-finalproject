@@ -6,5 +6,5 @@ Lib
 Scripts
 *.pyc
 __pycache__
-staticfiles
+#staticfiles
 #db.sqlite3
