@@ -36,7 +36,7 @@ def callback(request):
             return HttpResponseBadRequest()
         
         columns=[]
-        domain = 'https://0cc35bf83b19.ngrok.io/'+'/' #網域
+        domain = 'https://cyim-finalproject.herokuapp.com'+'/' #網域
         
         for event in events:
             if isinstance(event, MessageEvent):
