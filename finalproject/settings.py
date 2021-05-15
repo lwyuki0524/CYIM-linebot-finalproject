@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'cyimapp'
+    'cyimapp',
+    'cloudinary',
 ]
 
 MIDDLEWARE = [
@@ -104,6 +105,14 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': 'lwyuki',
+    'API_KEY': '456243514244678',
+    'API_SECRET': 'YI7qZLH1Dl5e-FV3dOlvIMd6Aqc',
+}
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
@@ -128,7 +137,9 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-STATIC_ROOT = os.path.join(BASE_DIR, 'assest')
+STATIC_ROOT = 'staticfiles'
 STATICFILES_DIR = [
 os.path.join(BASE_DIR, 'static')
 ]
+
+STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
