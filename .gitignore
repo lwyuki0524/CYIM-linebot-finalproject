@@ -1,9 +1,6 @@
 # djangogirls/.gitignore
 
-#projectvenv
-Include
-Lib
-Scripts
+projectvenv
 *.pyc
 __pycache__
 #staticfiles

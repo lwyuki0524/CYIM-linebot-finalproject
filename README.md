@@ -40,7 +40,7 @@ Cloudinary網站：https://cloudinary.com/
     3. Line message api( Webhook URL：改成[ngrok提供的網域]/callback )
     4. Line login(LIFF)( Endpoint URL：前面改成[ngrok提供的網域]/ )
 ```
-* 測試完畢要上傳github前，請將上方第2點的設定改回來。
+* 測試完畢要上傳github前，請將上方的設定改回來。
 
 <br>
 
