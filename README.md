@@ -1,8 +1,10 @@
 # CYIM-linebot-finalproject
  為大一新生設計的生活輔助系統
 
-` 已部署到Heroku` `使用Cloudinary`
-
+` 已部署到Heroku` `使用Cloudinary`  
+django資料庫：https://cyim-finalproject.herokuapp.com/admin  
+Heroku網站：https://dashboard.heroku.com/login  
+Cloudinary網站：https://cloudinary.com/  
 
 #### 📌主題：
     1. 食物：飲料店、午餐、早午餐...
