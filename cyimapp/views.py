@@ -17,7 +17,7 @@ from templates import replyCarousel
 line_bot_api = LineBotApi(settings.LINE_CHANNEL_ACCESS_TOKEN)
 parser = WebhookParser(settings.LINE_CHANNEL_SECRET)
 
-#domain = 'https://7640ef682f50.ngrok.io'+'/' #本地端網域       #### 測試時請使用這個(註解下方的domain)####
+#domain = 'https://914d214b2e67.ngrok.io'+'/' #本地端網域       #### 測試時請使用這個(註解下方的domain)####
 domain = 'https://res.cloudinary.com/lwyuki/image/upload/v1'+'/'#### heroku網域(上傳github請使用這個) ####
 
 # show 資料表

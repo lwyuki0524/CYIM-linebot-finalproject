@@ -22,9 +22,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-zs!)ec&$zdq0$s#8t8*qk!x_vy31$obhk%xq+bskzjx#z$v5z%'
 
-####下方Token跟Secret請改成自己的####
+####於本地端測試時，下方Token跟Secret請改成自己的  (上傳github時，請註解掉)####
+#LINE_CHANNEL_ACCESS_TOKEN = '請輸入你的LINE_CHANNEL_ACCESS_TOKEN'
+#LINE_CHANNEL_SECRET = '請輸入你的LINE_CHANNEL_SECRET'
+
+####於本地端測試時請把下方註解####
 LINE_CHANNEL_ACCESS_TOKEN = 'pgkIDzjYN+icPyo1NxOcJa8o8wnnbX7Zyj2J9ta9lxLX0QyaaitbqPsAMOl9HIBsi8zK68sDIRn5hSK7zqzOrHmf+ikIGT5MVoEML1J9FtqQRoek4BxboHbiKiFuv/3F7Hc0in7mJiiM255+X1pTdwdB04t89/1O/w1cDnyilFU='
 LINE_CHANNEL_SECRET = 'fe024cacf7fe6b23c717e0a8e97d7707'
+####於本地端測試時請把上方註解####
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -146,9 +152,6 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 STATIC_ROOT = 'staticfiles'
-####本地端測試時使用(把註解拿掉)####
 STATICFILES_DIRS = [os.path.join(BASE_DIR,'static')]
-####本地端測試請註解下面####
-#STATICFILES_DIR = [os.path.join(BASE_DIR, 'static')]
 
 #STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'

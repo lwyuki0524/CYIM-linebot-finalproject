@@ -41,6 +41,7 @@ Cloudinary網站：https://cloudinary.com/
     4. Line login(LIFF)( Endpoint URL：前面改成[ngrok提供的網域]/ )
 ```
 * 測試完畢要上傳github前，請將上方的設定改回來。
+`( 第4點的[ngrok提供的網域] 要改回 https://cyim-finalproject.herokuapp.com )`
 
 <br>
 
