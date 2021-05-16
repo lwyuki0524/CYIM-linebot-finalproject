@@ -1,22 +1,20 @@
 # CYIM-linebot-finalproject
  為大一新生設計的生活輔助系統
 
-` 已部署到Heroku` `使用Cloudinary`  
+` 部署到Heroku` `使用Cloudinary`  
 django資料庫：https://cyim-finalproject.herokuapp.com/admin  
 Heroku網站：https://dashboard.heroku.com/login  
 Cloudinary網站：https://cloudinary.com/  
 
 #### 📌主題：
-    1. 食物：飲料店、午餐、早午餐...
+    1. 食物：早餐、午餐、點心、飲料 
     2. 交通：公車、Ubike (站牌)
-    3. 選課：選課大全
 
 
 
 #### 📌期望功能：
-    1. 食物：查詢菜單、隨機找店家、…(其他功能)
-    2. 交通：公車資訊、Ubike資訊、校園地圖
-    3. 選課：課程評論
+    1. 食物：隨機找店家、定位搜尋、(額外功能：訂餐紀錄、查詢菜單)
+    2. 交通：公車資訊、Ubike資訊、機車停車位、校園地圖
 
 
 
@@ -31,20 +29,42 @@ Cloudinary網站：https://cloudinary.com/
 #### Webhook URL in Line
 `https://[ Heroku app Name ].herokuapp.com/callback`
 
-#### 建立虛擬環境
-（若是projectvenv目錄已經存在，就不需要建立：`python -m venv projectvenv` ）
+
+#### 本地端測試時
+* 啟動ngrok：  
+在cmd中，移動到專案資料夾內`cd [路徑]`，啟動`ngrok http 8000`
+* 測試時需要改的資料：  
+```
+    1. settings.py (詳細請看檔案內註解說明)
+    2. views.py (詳細請看檔案內註解說明)
+    3. Line message api( Webhook URL：改成[ngrok提供的網域]/callback )
+    4. Line login(LIFF)( Endpoint URL：前面改成[ngrok提供的網域]/ )
+```
+* 測試完畢要上傳github前，請將上方第2點的設定改回來。
+
+<br>
+
+---
+<br>
+
+#### 下載此專案後
+
+##### 1. 建立虛擬環境
+（若是projectvenv目錄已經存在，就不需要建立，否則請輸入：`python -m venv projectvenv` ）
 
 `cd projectvenv`
 
 `scripts\activate`
 
-#### 安裝套件
+##### 2. 安裝套件
 
 `cd..` <font color=#008000>#移到主目錄下</font>  
 `pip install -r requirements.txt` <font color=#008000>#安裝requirements文件中的套件</font>  
 
-#### 離開虛擬環境
+##### 3. 離開虛擬環境
 `deactivate`
+
+<br>
 
 #### 檔案結構
 ```

@@ -17,7 +17,8 @@ from templates import replyCarousel
 line_bot_api = LineBotApi(settings.LINE_CHANNEL_ACCESS_TOKEN)
 parser = WebhookParser(settings.LINE_CHANNEL_SECRET)
 
-domain = 'https://res.cloudinary.com/lwyuki/image/upload/v1'+'/' #網域
+#domain = 'https://7640ef682f50.ngrok.io'+'/' #本地端網域       #### 測試時請使用這個(註解下方的domain)####
+domain = 'https://res.cloudinary.com/lwyuki/image/upload/v1'+'/'#### heroku網域(上傳github請使用這個) ####
 
 # show 資料表
 def listfoodTable(request):
@@ -68,13 +69,15 @@ def callback(request):
         
         for event in events:
             if isinstance(event, MessageEvent):
-
+                #如果收到/foodTable，傳資料表
                 if event.message.text=="/foodTable" :
                     line_bot_api.reply_message(event.reply_token,TextSendMessage(
                         text='https://liff.line.me/'+'1655990146-npeZ9k20') )
+                #如果收到關鍵字，隨機傳店家資訊
                 elif randomFood(event):
                     carousel_template_message=randomFood(event)
                     line_bot_api.reply_message(event.reply_token, carousel_template_message)
+                #鸚鵡回話
                 else:
                     line_bot_api.reply_message(event.reply_token,TextSendMessage(text = event.message.text) )
 

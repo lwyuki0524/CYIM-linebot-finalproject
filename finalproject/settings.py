@@ -21,6 +21,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-zs!)ec&$zdq0$s#8t8*qk!x_vy31$obhk%xq+bskzjx#z$v5z%'
+
+####下方Token跟Secret請改成自己的####
 LINE_CHANNEL_ACCESS_TOKEN = 'pgkIDzjYN+icPyo1NxOcJa8o8wnnbX7Zyj2J9ta9lxLX0QyaaitbqPsAMOl9HIBsi8zK68sDIRn5hSK7zqzOrHmf+ikIGT5MVoEML1J9FtqQRoek4BxboHbiKiFuv/3F7Hc0in7mJiiM255+X1pTdwdB04t89/1O/w1cDnyilFU='
 LINE_CHANNEL_SECRET = 'fe024cacf7fe6b23c717e0a8e97d7707'
 
@@ -45,7 +47,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',#安裝whitenoise套件
+    #'whitenoise.middleware.WhiteNoiseMiddleware',#安裝whitenoise套件
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -104,6 +106,8 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+####本地測試時要註解下方區段####
+####上傳github要拿掉註解####
 
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': 'lwyuki',
@@ -112,6 +116,10 @@ CLOUDINARY_STORAGE = {
 }
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+####上傳github要拿掉註解####
+####本地測試時要註解上方區段####
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
@@ -138,8 +146,9 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 STATIC_ROOT = 'staticfiles'
-STATICFILES_DIR = [
-os.path.join(BASE_DIR, 'static')
-]
+####本地端測試時使用(把註解拿掉)####
+STATICFILES_DIRS = [os.path.join(BASE_DIR,'static')]
+####本地端測試請註解下面####
+#STATICFILES_DIR = [os.path.join(BASE_DIR, 'static')]
 
 #STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
