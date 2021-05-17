@@ -117,9 +117,8 @@ Cloudinary網站：https://cloudinary.com/
 │  └─js
 └─templates
     │  listfoodTable.html
-    │  replyCarousel.py
-    │
-    └─__pycache__
+    └─ replyCarousel.py
+
 ```
 
 

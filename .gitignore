@@ -1,7 +1,6 @@
 # djangogirls/.gitignore
-
 projectvenv
 *.pyc
 __pycache__
-#staticfiles
+staticfiles
 #db.sqlite3
