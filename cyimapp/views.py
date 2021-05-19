@@ -17,8 +17,8 @@ from templates import replyCarousel
 line_bot_api = LineBotApi(settings.LINE_CHANNEL_ACCESS_TOKEN)
 parser = WebhookParser(settings.LINE_CHANNEL_SECRET)
 
-#domain = 'https://0681cff91f49.ngrok.io'+'/' #本地端網域       #### 測試時請使用這個(註解下方的domain)####
-domain = 'https://res.cloudinary.com/lwyuki/image/upload/v1'+'/'#### heroku網域(上傳github請使用這個) ####
+#domain = 'https://082a3c1a3840.ngrok.io'+'/' #本地端網域       #### 測試時請使用這個(註解下方的domain)####
+domain = 'https://res.cloudinary.com/lwyuki/image/upload/v1'+'/'#### cloudinary網域(上傳github請使用這個) ####
 
 # show 資料表
 def listfoodTable(request):
@@ -26,9 +26,9 @@ def listfoodTable(request):
     return render(request, "listfoodTable.html", locals())
 
 # 快速回覆
-def quick_reply():
+def food_quick_reply():
     message=TextSendMessage(
-        text="請選擇功能：",
+        text="請選擇功能",
         quick_reply=QuickReply(
         items=[
             QuickReplyButton(action=MessageAction(label="時段推薦",text="/時段推薦")),#回傳文字
@@ -64,9 +64,37 @@ def randomFood(event):
         return carousel_template_message
     else:
         return False
-            
-    
-        
+
+
+###飲食區功能###
+def foodArea(event):
+    #如果收到/飲食區，傳快速回覆訊息
+    if event.message.text=='/飲食區':
+        line_bot_api.reply_message(event.reply_token,food_quick_reply() )
+
+     #隨機推薦此時段的店家
+    elif event.message.text=="/時段推薦" :
+        print("/時段推薦")
+        line_bot_api.reply_message(event.reply_token,TextSendMessage(text = "還沒做...") )
+
+    return None
+
+
+###交通區功能###
+def trafficArea(event):
+    #############
+    #
+    #
+    #   todo
+    #
+    #
+    #############
+    return None
+
+
+foodAreaList =['/飲食區','/時段推薦'] #飲食區功能列表
+trafficAreaList =['/交通區',] #交通區功能列表
+
 
 @csrf_exempt
 def callback(request):
@@ -84,15 +112,15 @@ def callback(request):
             if isinstance(event, MessageEvent):
                 #文字訊息
                 if event.message.type=='text':
-                    #如果收到/飲食區，傳快速回覆訊息
-                    if event.message.text=="/飲食區" :
-                        msg = quick_reply()
-                        line_bot_api.reply_message(event.reply_token,msg )
-                    #隨機推薦此時段的店家
-                    elif event.message.text=="/時段推薦" :
-                        print("/時段推薦")
-                        line_bot_api.reply_message(event.reply_token,TextSendMessage(text = "還沒做...") )
+                    #飲食區功能
+                    if event.message.text in foodAreaList :
+                        foodArea(event)
+                    #交通區功能
+                    elif event.message.text in trafficAreaList :
+                        trafficArea(event)
 
+
+                    #以下為測試用#
                     #如果收到/foodTable，傳資料表(測試用)
                     elif event.message.text=="/foodTable" :
                         line_bot_api.reply_message(event.reply_token,TextSendMessage(
@@ -107,6 +135,7 @@ def callback(request):
 
                 #定位訊息
                 elif event.message.type=='location':
+                    #(飲食區)距離推薦
                     print(event.message)
                     #傳回經緯度(測試用)
                     line_bot_api.reply_message(event.reply_token,
