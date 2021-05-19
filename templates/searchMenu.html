@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <title>菜單搜尋</title>
+        <style>
+            *{
+                font-size: 50px;
+            }
+            button{
+                height: 100px;
+                padding: 10px 15px;
+            }
+            img{
+                width: 900px;
+            }
+
+
+        </style>
+    </head>
+    <body>
+        <h1>菜單搜尋 {{errormessage}}</h1>
+        
+
+        <form action=""  method="get">
+            <h4>分類</h4>
+            <button name="fTag" type="submit" value="早餐">早餐</button>
+            <button name="fTag" type="submit" value="早午餐">早午餐</button>
+            <button name="fTag" type="submit" value="午餐">午餐</button>
+            <button name="fTag" type="submit" value="點心">點心</button>
+            <button name="fTag" type="submit" value="飲料">飲料</button>
+
+            <h4>餐廳</h4>
+            <select name="fName">
+                <option value="">請選擇餐廳</option>
+                {% for foodTable in allfoods %}
+                    <option value='{{foodTable.fName}}'>{{foodTable.fName}}</option>
+                {% endfor %}
+            </select>
+            
+            <input type="submit" value="搜尋">
+        </form>
+        
+        {% for food in f_menu %}
+            <h3>{{food.fName}} - 菜單 </h3>
+            <img src='https://972339162419.ngrok.io/{{food.fMenuImage}}' alt="">
+        {% endfor %}
+
+        
+    </body>
+
+</html>
