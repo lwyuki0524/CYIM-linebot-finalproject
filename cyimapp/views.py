@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from linebot.models.actions import URIAction
 from cyimapp.models import foodTable
 from django.conf import settings
 from django.http import HttpResponse,HttpResponseBadRequest,HttpResponseForbidden
@@ -17,7 +18,7 @@ from cyimapp.myLibrary.distance import haversine #計算距離
 line_bot_api = LineBotApi(settings.LINE_CHANNEL_ACCESS_TOKEN)
 parser = WebhookParser(settings.LINE_CHANNEL_SECRET)
 
-#domain = 'https://972339162419.ngrok.io'+'/' #本地端網域       #### 測試時請使用這個(註解下方的domain)####
+#domain = 'https://1c3baabc0fd8.ngrok.io'+'/' #本地端網域       #### 測試時請使用這個(註解下方的domain)####
 domain = 'https://res.cloudinary.com/lwyuki/image/upload/v1'+'/'#### cloudinary網域(上傳github請使用這個) ####
 
 # show 資料表
@@ -27,7 +28,6 @@ def listfoodTable(request):
 
 #菜單搜尋
 def searchMenu(request):
-    path = request.path  # 加入本行
     allfoods  = foodTable.objects.all().order_by('id')
     if 'fTag' in request.GET:
         allfoods = foodTable.objects.filter( fTag = request.GET['fTag'] )
@@ -50,7 +50,8 @@ def food_quick_reply():
         items=[
             QuickReplyButton(action=MessageAction(label="時段推薦",text="/時段推薦")),#回傳文字
             QuickReplyButton(action=LocationAction(label="定位搜尋")),#傳回定位資訊
-            QuickReplyButton(action=MessageAction(label="菜單搜尋",text="/菜單搜尋"))#傳回定位資訊
+            QuickReplyButton(action=URIAction(label="菜單搜尋",uri='https://liff.line.me/1655990146-4dZdvw9P',
+             alt_uri='https://liff.line.me/1655990146-4dZdvw9P')),#網頁連結
             ]
         )
     )
@@ -95,14 +96,7 @@ def foodArea(event):
         elif event.message.text=="/時段推薦" :
             print("/時段推薦")
             line_bot_api.reply_message(event.reply_token,TextSendMessage(text = "還沒做...") )
-        
-        #搜尋菜單
-        elif event.message.text=="/菜單搜尋" :
-            print("/菜單搜尋")
-            line_bot_api.reply_message(event.reply_token,TextSendMessage(
-                            text='https://liff.line.me/'+'1655990146-4dZdvw9P') )
-            
-            
+
     elif event.message.type=='location':  #距離推薦
         #中原大學經緯度
         x_longitude = 121.2420486
@@ -115,6 +109,7 @@ def foodArea(event):
     return None
 
 
+
 ###交通區功能###
 def trafficArea(event):
     #############
@@ -125,6 +120,7 @@ def trafficArea(event):
     #
     #############
     return None
+
 
 
 foodAreaList =['/飲食區','/時段推薦','/菜單搜尋'] #飲食區功能列表
