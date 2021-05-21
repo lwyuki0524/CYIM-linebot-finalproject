@@ -4,7 +4,7 @@ from cyimapp.models import foodTable
 # Register your models here.
 
 class foodadmin(admin.ModelAdmin):
-    list_display = ('id', 'fName', 'fMenuImage', 'fAddress','fUrl','fTag')#, 'fFoodImage'
+    list_display = ('id', 'fName', 'fMenuImage', 'fAddress','fUrl','fTag','fLongitude','fLatitude','fStartTime','fEndTime')#, 'fFoodImage'
     list_filter = ('fName','fTag')
     search_fields = ('fName',)
     ordering = ('id',)
