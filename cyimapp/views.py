@@ -202,7 +202,7 @@ nowArea = "None" #紀錄目前點擊的是/飲食區 或/交通區
 
 @csrf_exempt
 def callback(request):
-    #global nowArea
+    global nowArea
     if request.method == 'POST':
         signature = request.META['HTTP_X_LINE_SIGNATURE']
         body = request.body.decode('utf-8')
