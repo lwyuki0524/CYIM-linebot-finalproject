@@ -13,6 +13,7 @@ from urllib import parse#中文URL轉碼
 from templates import replyCarousel
 
 from cyimapp.myLibrary.distance import haversine #計算距離
+from cyimapp.myLibrary.real_ubike import getUbikeData #取得Ubike資訊
 from datetime import datetime
 from random import sample
 
@@ -20,7 +21,7 @@ from random import sample
 line_bot_api = LineBotApi(settings.LINE_CHANNEL_ACCESS_TOKEN)
 parser = WebhookParser(settings.LINE_CHANNEL_SECRET)
 
-#domain = 'https://c55404aae5cc.ngrok.io'+'/' #本地端網域       #### 測試時請使用這個(註解下方的domain)####
+#domain = 'https://81e018568723.ngrok.io'+'/' #本地端網域       #### 測試時請使用這個(註解下方的domain)####
 domain = 'https://res.cloudinary.com/lwyuki/image/upload/v1'+'/'#### cloudinary網域(上傳github請使用這個) ####
 
 # show 資料表
@@ -44,7 +45,7 @@ def searchMenu(request):
         allfoods = foodTable.objects.all().order_by('id')
         return render(request, "searchMenu.html", locals())
 
-# 快速回覆
+# 食物區快速回覆
 def food_quick_reply():
     message=TextSendMessage(
         text="請選擇功能",
@@ -80,7 +81,7 @@ def randomFood(event):
         #如果有5筆以上資料，隨機挑5筆
         if len(columns)>=5:
             columns = sample(columns,5)
-            
+
         carousel_template_message = TemplateSendMessage(alt_text='Carousel template', template=CarouselTemplate(columns=columns))
         return carousel_template_message
     else:
@@ -137,7 +138,7 @@ def foodArea(event):
             #計算距離
             if food_item.fLongitude != "" and food_item.fLatitude != "":
                 dist = haversine( event.message.longitude, event.message.latitude, float(food_item.fLongitude) , float(food_item.fLatitude) )
-                foodsDistance.setdefault(food_item.id,dist)
+                foodsDistance.update({food_item.id:dist})
         sortedFoods = sorted(foodsDistance.items(), key=lambda d: d[1])[:5] #按照值做排序
 
         columns=[]
@@ -153,8 +154,31 @@ def foodArea(event):
 
 
 
+
+# 交通區快速回覆
+def traffic_quick_reply():
+    message=TextSendMessage(
+        text="請選擇功能",
+        quick_reply=QuickReply(
+        items=[
+            QuickReplyButton(action=MessageAction(label="公車資訊",text="/公車資訊")),#回傳文字
+            QuickReplyButton(action=LocationAction(label="最近Ubike")),#傳回定位資訊
+            ]
+        )
+    )
+    return message
+
 ###交通區功能###
 def trafficArea(event):
+
+    if event.message.type=='text':    
+    #如果收到/交通區，傳快速回覆訊息
+        if event.message.text=='/交通區':
+            line_bot_api.reply_message(event.reply_token,traffic_quick_reply() )
+
+    elif event.message.type=='location':  #查詢最近10筆 Ubike 資訊
+        text = getUbikeData(event.message.longitude, event.message.latitude)
+        line_bot_api.reply_message(event.reply_token,TextSendMessage(text = text) )
     #############
     #
     #
@@ -167,10 +191,13 @@ def trafficArea(event):
 
 
 foodAreaList =['/飲食區','/時段推薦','/菜單搜尋'] #飲食區功能列表
-trafficAreaList =['/交通區',] #交通區功能列表
+trafficAreaList =['/交通區'] #交通區功能列表
+
+nowArea = "None" #紀錄目前點擊的是/飲食區 或/交通區
 
 @csrf_exempt
 def callback(request):
+    global nowArea
     if request.method == 'POST':
         signature = request.META['HTTP_X_LINE_SIGNATURE']
         body = request.body.decode('utf-8')
@@ -187,9 +214,11 @@ def callback(request):
                 if event.message.type=='text':
                     #飲食區功能
                     if event.message.text in foodAreaList :
+                        nowArea = "foodArea"
                         foodArea(event)
                     #交通區功能
                     elif event.message.text in trafficAreaList :
+                        nowArea = "trafficArea"
                         trafficArea(event)
 
 
@@ -208,8 +237,14 @@ def callback(request):
 
                 #定位訊息
                 elif event.message.type=='location':
-                    #進入飲食區功能
-                    foodArea(event)
+                    if nowArea == "foodArea":
+                        #進入飲食區功能
+                        foodArea(event)
+                    elif nowArea == "trafficArea":
+                        #進入交通區功能
+                        trafficArea(event)
+                    else:
+                        line_bot_api.reply_message(event.reply_token,TextSendMessage(text = "請點選飲食區或交通區") )
                     
             
         return HttpResponse()
