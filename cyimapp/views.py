@@ -15,6 +15,7 @@ from templates import replyCarousel
 from cyimapp.myLibrary.distance import haversine #計算距離
 from cyimapp.myLibrary.real_ubike import getUbikeData #取得Ubike資訊
 from datetime import datetime, time
+import time
 from random import sample
 
 # Create your views here.
