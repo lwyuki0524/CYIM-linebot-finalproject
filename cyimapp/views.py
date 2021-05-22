@@ -18,7 +18,7 @@ from cyimapp.myLibrary.distance import haversine #計算距離
 line_bot_api = LineBotApi(settings.LINE_CHANNEL_ACCESS_TOKEN)
 parser = WebhookParser(settings.LINE_CHANNEL_SECRET)
 
-#domain = 'https://1a92cab4a675.ngrok.io'+'/' #本地端網域       #### 測試時請使用這個(註解下方的domain)####
+#domain = 'https://ffeaa65c40c4.ngrok.io'+'/' #本地端網域       #### 測試時請使用這個(註解下方的domain)####
 domain = 'https://res.cloudinary.com/lwyuki/image/upload/v1'+'/'#### cloudinary網域(上傳github請使用這個) ####
 
 # show 資料表
@@ -73,16 +73,20 @@ def randomFood(event):
     if unit.exists():
         print(unit)
         for item in unit :
-            url = domain+parse.quote(str(item.fMenuImage).encode('utf-8'))
-            print(url)
-            message = replyCarousel.CarouselReply(item.fUrl,url,item.fName,item.fAddress )
-            columns.append(message)
-        
-        carousel_template_message = TemplateSendMessage(alt_text='Carousel template',
-                                                        template=CarouselTemplate(columns=columns))
+            addCarouselItem(item,columns)
+        carousel_template_message = TemplateSendMessage(alt_text='Carousel template', template=CarouselTemplate(columns=columns))
         return carousel_template_message
     else:
         return False
+
+
+# 將要製作成 Carousel的物件 傳送進去，輸出Carousel物件集合 (最多5個)
+def addCarouselItem(item,columns):
+    url = domain+parse.quote(str(item.fMenuImage).encode('utf-8'))
+    print(url)
+    message = replyCarousel.CarouselReply(item.fUrl,url,item.fName,item.fAddress )
+    columns.append(message)
+    return None
 
 
 ###飲食區功能###
@@ -98,14 +102,25 @@ def foodArea(event):
             line_bot_api.reply_message(event.reply_token,TextSendMessage(text = "還沒做...") )
 
     elif event.message.type=='location':  #距離推薦
-        #中原大學經緯度
-        x_longitude = 121.2420486
-        y_latitude = 24.9569337
-        #計算距離
-        dist = haversine( event.message.longitude, event.message.latitude, x_longitude, y_latitude )
+        #計算自己與所有店家的距離
+        foodsDistance = dict() #建立字典("店家":與自己的距離)
+        food_entry_list = list(foodTable.objects.all()) #取出所有food資料
+        for food_item in food_entry_list:
+            #計算距離
+            if food_item.fLongitude != "" and food_item.fLatitude != "":
+                dist = haversine( event.message.longitude, event.message.latitude, float(food_item.fLongitude) , float(food_item.fLatitude) )
+                foodsDistance.setdefault(food_item.id,dist)
+        sortedFoods = sorted(foodsDistance.items(), key=lambda d: d[1])[:5] #按照值做排序
+
+        columns=[]
+        for foodDict in sortedFoods:
+            unit = foodTable.objects.filter( id = foodDict[0] ) #過濾資料
+            for item in unit:
+                addCarouselItem(item,columns)
+
         #傳回經緯度(測試用)
-        line_bot_api.reply_message(event.reply_token,TextSendMessage(text = 'latitude：'+
-         str(event.message.latitude) + '\nlongitude：'+str(event.message.longitude) +'\n 與中原資管系距離為：'+str(dist)+'公尺' ) )
+        line_bot_api.reply_message(event.reply_token,TemplateSendMessage(
+            alt_text='Carousel template',template=CarouselTemplate(columns=columns)) )
     return None
 
 
