@@ -76,6 +76,11 @@ def randomFood(event):
         print(unit)
         for item in unit :
             addCarouselItem(item,columns)
+
+        #如果有5筆以上資料，隨機挑5筆
+        if len(columns)>=5:
+            columns = sample(columns,5)
+            
         carousel_template_message = TemplateSendMessage(alt_text='Carousel template', template=CarouselTemplate(columns=columns))
         return carousel_template_message
     else:
