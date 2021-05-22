@@ -13,12 +13,14 @@ from urllib import parse#中文URL轉碼
 from templates import replyCarousel
 
 from cyimapp.myLibrary.distance import haversine #計算距離
+from datetime import datetime
+from random import sample
 
 # Create your views here.
 line_bot_api = LineBotApi(settings.LINE_CHANNEL_ACCESS_TOKEN)
 parser = WebhookParser(settings.LINE_CHANNEL_SECRET)
 
-#domain = 'https://ffeaa65c40c4.ngrok.io'+'/' #本地端網域       #### 測試時請使用這個(註解下方的domain)####
+#domain = 'https://c55404aae5cc.ngrok.io'+'/' #本地端網域       #### 測試時請使用這個(註解下方的domain)####
 domain = 'https://res.cloudinary.com/lwyuki/image/upload/v1'+'/'#### cloudinary網域(上傳github請使用這個) ####
 
 # show 資料表
@@ -80,7 +82,7 @@ def randomFood(event):
         return False
 
 
-# 將要製作成 Carousel的物件 傳送進去，輸出Carousel物件集合 (最多5個)
+# 輸入 要製作成 Carousel的物件，輸出Carousel物件集合 (最多5個)
 def addCarouselItem(item,columns):
     url = domain+parse.quote(str(item.fMenuImage).encode('utf-8'))
     print(url)
@@ -91,20 +93,41 @@ def addCarouselItem(item,columns):
 
 ###飲食區功能###
 def foodArea(event):
+    food_entry_list = list(foodTable.objects.all()) #取出所有food資料
     if event.message.type=='text':
+        
         #如果收到/飲食區，傳快速回覆訊息
         if event.message.text=='/飲食區':
             line_bot_api.reply_message(event.reply_token,food_quick_reply() )
 
+
         #隨機推薦此時段的店家
         elif event.message.text=="/時段推薦" :
-            print("/時段推薦")
-            line_bot_api.reply_message(event.reply_token,TextSendMessage(text = "還沒做...") )
+            myTime = datetime.now().time()
+            columns = []
+            foodOpenId = []
+            for food_item in food_entry_list:
+                if food_item.fStartTime!=None and food_item.fEndTime!=None:
+                    if food_item.fStartTime <= myTime and food_item.fEndTime >= myTime:
+                        foodOpenId.append(food_item.id)  # 將此時段營業的店家id記錄下來
+                        
+            #如果有5家以上的店營業，隨機挑5筆
+            if len(foodOpenId)>=5:
+                foodOpenId = sample(foodOpenId,5)
+
+            for foodid in foodOpenId:
+                unit = foodTable.objects.filter( id = foodid ) # 找出有營業店家的資料
+                for item in unit:
+                    addCarouselItem(item,columns)
+             #傳回5筆以內有在營業的店家
+            line_bot_api.reply_message(event.reply_token,TemplateSendMessage(
+                alt_text='Carousel template',template=CarouselTemplate(columns=columns)) )
+
 
     elif event.message.type=='location':  #距離推薦
         #計算自己與所有店家的距離
         foodsDistance = dict() #建立字典("店家":與自己的距離)
-        food_entry_list = list(foodTable.objects.all()) #取出所有food資料
+        
         for food_item in food_entry_list:
             #計算距離
             if food_item.fLongitude != "" and food_item.fLatitude != "":
@@ -118,7 +141,7 @@ def foodArea(event):
             for item in unit:
                 addCarouselItem(item,columns)
 
-        #傳回經緯度(測試用)
+        #傳回5個最近的店家
         line_bot_api.reply_message(event.reply_token,TemplateSendMessage(
             alt_text='Carousel template',template=CarouselTemplate(columns=columns)) )
     return None
@@ -140,7 +163,6 @@ def trafficArea(event):
 
 foodAreaList =['/飲食區','/時段推薦','/菜單搜尋'] #飲食區功能列表
 trafficAreaList =['/交通區',] #交通區功能列表
-
 
 @csrf_exempt
 def callback(request):
