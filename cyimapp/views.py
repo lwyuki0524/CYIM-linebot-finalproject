@@ -99,11 +99,13 @@ def addCarouselItem(item,columns):
 
 ###飲食區功能###
 def foodArea(event):
+    global nowArea
     food_entry_list = list(foodTable.objects.all()) #取出所有food資料
     if event.message.type=='text':
         
         #如果收到/飲食區，傳快速回覆訊息
         if event.message.text=='/飲食區':
+            nowArea = "foodArea"
             line_bot_api.reply_message(event.reply_token,food_quick_reply() )
 
 
@@ -121,7 +123,7 @@ def foodArea(event):
             if len(foodOpenId)>=5:
                 foodOpenId = sample(foodOpenId,5)
             elif len(foodOpenId)==0:
-                line_bot_api.reply_message(event.reply_token,TextSendMessage(text = "目前資料無營業店家..."))
+                line_bot_api.reply_message(event.reply_token,TextSendMessage(text = "目前資料無營業中店家..."))
 
             for foodid in foodOpenId:
                 unit = foodTable.objects.filter( id = foodid ) # 找出有營業店家的資料
@@ -172,10 +174,11 @@ def traffic_quick_reply():
 
 ###交通區功能###
 def trafficArea(event):
-
+    global nowArea
     if event.message.type=='text':    
     #如果收到/交通區，傳快速回覆訊息
         if event.message.text=='/交通區':
+            nowArea = "trafficArea"
             line_bot_api.reply_message(event.reply_token,traffic_quick_reply() )
 
     elif event.message.type=='location':  #查詢最近10筆 Ubike 資訊
