@@ -14,7 +14,7 @@ from templates import replyCarousel
 
 from cyimapp.myLibrary.distance import haversine #計算距離
 from cyimapp.myLibrary.real_ubike import getUbikeData #取得Ubike資訊
-from datetime import datetime
+from datetime import datetime, time
 from random import sample
 
 # Create your views here.
@@ -242,6 +242,7 @@ def callback(request):
 
                 #定位訊息
                 elif event.message.type=='location':
+                    time.sleep(1.5)
                     if nowArea == "foodArea":
                         #進入飲食區功能
                         foodArea(event)
