@@ -120,6 +120,8 @@ def foodArea(event):
             #如果有5家以上的店營業，隨機挑5筆
             if len(foodOpenId)>=5:
                 foodOpenId = sample(foodOpenId,5)
+            elif len(foodOpenId)==0:
+                line_bot_api.reply_message(event.reply_token,TextSendMessage(text = "目前資料無營業店家..."))
 
             for foodid in foodOpenId:
                 unit = foodTable.objects.filter( id = foodid ) # 找出有營業店家的資料
