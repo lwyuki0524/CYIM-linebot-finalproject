@@ -5,6 +5,36 @@ from cyimapp.myLibrary.distance import haversine #計算距離
 url = "https://data.tycg.gov.tw/opendata/datalist/datasetMeta/download?id=5ca2bfc7-9ace-4719-88ae-4034b9a5a55c&rid=a1b4714b-3b75-4ff8-a8f2-cc377e4eaa0f"
 data = requests.get(url).json()
 
+#取得所有桃園Ubike資料
+def getUbikeInfo():
+    
+    listData =[]
+
+    ubike_info = {} # 站代號: [此站資料,我的距離]
+
+    for key, value in data["retVal"].items():
+        sno = value["sno"]    #代號
+        sna = value["sna"]    #場站名稱
+        sbi = value["sbi"]    #可租借數
+        bemp = value["bemp"]  #空位數
+
+        lat = value["lat"]    #緯度
+        lng = value["lng"]    #經度
+        
+        listData=[sno ,sna ,sbi ,bemp]
+        ubike_info.update( {sno : listData})
+
+    text ="站名\t  可租借數\t  可停車位\n"
+    text +="----------------------------------------------"
+    """
+    for key, value in ubike_info:
+        text += " \n"+value[1]+"\t "+value[2]+"\t "+value[3]
+    """
+    return ubike_info
+
+
+
+#找離自己最近的10筆資料
 def getUbikeData(myLongitude, myLatitude):
     
     listData =[]

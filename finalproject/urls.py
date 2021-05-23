@@ -16,7 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.conf.urls import url
-from cyimapp.views import callback,listfoodTable,searchMenu
+from cyimapp.views import callback,listfoodTable,searchMenu,searchUbike
 from django.conf.urls.static import static
 #from django.conf import settings
 
@@ -25,6 +25,7 @@ urlpatterns = [
     url('^callback',callback),
     url(r'^listfoodTable$', listfoodTable),
     url(r'^searchMenu$', searchMenu),
+    url(r'^searchUbike$', searchUbike),
 ]
 
 #urlpatterns+=static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS)

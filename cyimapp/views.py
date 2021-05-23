@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from linebot.models.actions import URIAction
+from linebot.models.actions import PostbackAction, URIAction
 from cyimapp.models import foodTable
 from django.conf import settings
 from django.http import HttpResponse,HttpResponseBadRequest,HttpResponseForbidden
@@ -13,7 +13,7 @@ from urllib import parse#中文URL轉碼
 from templates import replyCarousel
 
 from cyimapp.myLibrary.distance import haversine #計算距離
-from cyimapp.myLibrary.real_ubike import getUbikeData #取得Ubike資訊
+from cyimapp.myLibrary.real_ubike import getUbikeInfo #取得Ubike資訊
 from datetime import datetime, time
 import time
 from random import sample
@@ -22,7 +22,7 @@ from random import sample
 line_bot_api = LineBotApi(settings.LINE_CHANNEL_ACCESS_TOKEN)
 parser = WebhookParser(settings.LINE_CHANNEL_SECRET)
 
-#domain = 'https://81e018568723.ngrok.io'+'/' #本地端網域       #### 測試時請使用這個(註解下方的domain)####
+#domain = 'https://d211f4ba3888.ngrok.io'+'/' #本地端網域       #### 測試時請使用這個(註解下方的domain)####
 domain = 'https://res.cloudinary.com/lwyuki/image/upload/v1'+'/'#### cloudinary網域(上傳github請使用這個) ####
 
 # show 資料表
@@ -100,18 +100,16 @@ def addCarouselItem(item,columns):
 
 ###飲食區功能###
 def foodArea(event):
-    global nowArea
-    food_entry_list = list(foodTable.objects.all()) #取出所有food資料
     if event.message.type=='text':
         
         #如果收到/飲食區，傳快速回覆訊息
         if event.message.text=='/飲食區':
-            nowArea = "foodArea"
             line_bot_api.reply_message(event.reply_token,food_quick_reply() )
 
 
         #隨機推薦此時段的店家
         elif event.message.text=="/時段推薦" :
+            food_entry_list = list(foodTable.objects.all()) #取出所有food資料
             myTime = datetime.now().time()
             columns = []
             foodOpenId = []
@@ -125,6 +123,7 @@ def foodArea(event):
                 foodOpenId = sample(foodOpenId,5)
             elif len(foodOpenId)==0:
                 line_bot_api.reply_message(event.reply_token,TextSendMessage(text = "目前資料無營業中店家..."))
+                return None
 
             for foodid in foodOpenId:
                 unit = foodTable.objects.filter( id = foodid ) # 找出有營業店家的資料
@@ -136,6 +135,7 @@ def foodArea(event):
 
 
     elif event.message.type=='location':  #距離推薦
+        food_entry_list = list(foodTable.objects.all()) #取出所有food資料
         #計算自己與所有店家的距離
         foodsDistance = dict() #建立字典("店家":與自己的距離)
         
@@ -159,6 +159,11 @@ def foodArea(event):
 
 
 
+#Ubike 資訊
+def searchUbike(request):
+    ubikeInfo = getUbikeInfo()
+    return render(request, "searchUbike.html", locals())
+
 
 # 交通區快速回覆
 def traffic_quick_reply():
@@ -167,7 +172,8 @@ def traffic_quick_reply():
         quick_reply=QuickReply(
         items=[
             QuickReplyButton(action=MessageAction(label="公車資訊",text="/公車資訊")),#回傳文字
-            QuickReplyButton(action=LocationAction(label="最近Ubike")),#傳回定位資訊
+            QuickReplyButton(action=URIAction(label="Ubike資訊",uri='https://liff.line.me/1655990146-0DxGKVrq',
+             alt_uri='https://liff.line.me/1655990146-0DxGKVrq')),#網頁連結
             ]
         )
     )
@@ -175,16 +181,11 @@ def traffic_quick_reply():
 
 ###交通區功能###
 def trafficArea(event):
-    global nowArea
     if event.message.type=='text':    
     #如果收到/交通區，傳快速回覆訊息
         if event.message.text=='/交通區':
-            nowArea = "trafficArea"
             line_bot_api.reply_message(event.reply_token,traffic_quick_reply() )
 
-    elif event.message.type=='location':  #查詢最近10筆 Ubike 資訊
-        text = getUbikeData(event.message.longitude, event.message.latitude)
-        line_bot_api.reply_message(event.reply_token,TextSendMessage(text = text) )
     #############
     #
     #
@@ -199,11 +200,9 @@ def trafficArea(event):
 foodAreaList =['/飲食區','/時段推薦','/菜單搜尋'] #飲食區功能列表
 trafficAreaList =['/交通區'] #交通區功能列表
 
-nowArea = "None" #紀錄目前點擊的是/飲食區 或/交通區
 
 @csrf_exempt
 def callback(request):
-    global nowArea
     if request.method == 'POST':
         signature = request.META['HTTP_X_LINE_SIGNATURE']
         body = request.body.decode('utf-8')
@@ -220,11 +219,9 @@ def callback(request):
                 if event.message.type=='text':
                     #飲食區功能
                     if event.message.text in foodAreaList :
-                        #nowArea = "foodArea"
                         foodArea(event)
                     #交通區功能
                     elif event.message.text in trafficAreaList :
-                        #nowArea = "trafficArea"
                         trafficArea(event)
 
 
@@ -243,15 +240,8 @@ def callback(request):
 
                 #定位訊息
                 elif event.message.type=='location':
-                    time.sleep(1.5)
-                    if nowArea == "foodArea":
-                        #進入飲食區功能
-                        foodArea(event)
-                    elif nowArea == "trafficArea":
-                        #進入交通區功能
-                        trafficArea(event)
-                    else:
-                        line_bot_api.reply_message(event.reply_token,TextSendMessage(text = "請點選飲食區或交通區") )
+                    #進入飲食區功能
+                    foodArea(event)
                     
             
         return HttpResponse()
