@@ -206,6 +206,7 @@ def searchUbike(request):
     return render(request, "searchUbike.html", locals())
 
 
+#傳送校園地圖
 def sendBack_map(event, backdata): #Postback
     try:
         message = ImageSendMessage(
@@ -217,6 +218,7 @@ def sendBack_map(event, backdata): #Postback
 
 
 ###上方為交通區功能###
+
 
 foodAreaList =['/飲食區','/時段推薦','/菜單搜尋'] #飲食區功能列表
 trafficAreaList =['/交通區'] #交通區功能列表
@@ -245,8 +247,6 @@ def callback(request):
                     elif event.message.text in trafficAreaList :
                         trafficArea(event)
 
-
-                    #以下為測試用#
                     #如果收到/foodTable，傳資料表(測試用)
                     elif event.message.text=="/foodTable" :
                         line_bot_api.reply_message(event.reply_token,TextSendMessage(
