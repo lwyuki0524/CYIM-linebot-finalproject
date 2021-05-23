@@ -1,5 +1,7 @@
 from django.shortcuts import render
 from linebot.models.actions import PostbackAction, URIAction
+from linebot.models.events import PostbackEvent
+from linebot.models.send_messages import ImageSendMessage
 from cyimapp.models import foodTable
 from django.conf import settings
 from django.http import HttpResponse,HttpResponseBadRequest,HttpResponseForbidden
@@ -10,6 +12,7 @@ from linebot.exceptions import InvalidSignatureError, LineBotApiError
 from linebot.models import MessageEvent, TextSendMessage,TemplateSendMessage,CarouselTemplate,QuickReply, messages
 from linebot.models import QuickReplyButton,MessageAction,LocationAction
 from urllib import parse#中文URL轉碼
+from urllib.parse import parse_qsl
 from templates import replyCarousel
 
 from cyimapp.myLibrary.distance import haversine #計算距離
@@ -25,26 +28,6 @@ parser = WebhookParser(settings.LINE_CHANNEL_SECRET)
 #domain = 'https://d211f4ba3888.ngrok.io'+'/' #本地端網域       #### 測試時請使用這個(註解下方的domain)####
 domain = 'https://res.cloudinary.com/lwyuki/image/upload/v1'+'/'#### cloudinary網域(上傳github請使用這個) ####
 
-# show 資料表
-def listfoodTable(request):
-    allfoods = foodTable.objects.all().order_by('id')
-    return render(request, "listfoodTable.html", locals())
-
-#菜單搜尋
-def searchMenu(request):
-    allfoods  = foodTable.objects.all().order_by('id')
-    if 'fTag' in request.GET:
-        allfoods = foodTable.objects.filter( fTag = request.GET['fTag'] )
-        return render(request, "searchMenu.html", locals())
-    else:
-        allfoods = foodTable.objects.all().order_by('id')
-
-    if 'fName' in request.GET:
-        f_menu = foodTable.objects.filter( fName = request.GET['fName'] )
-        return render(request, "searchMenu.html", locals())
-    else:
-        allfoods = foodTable.objects.all().order_by('id')
-        return render(request, "searchMenu.html", locals())
 
 # 食物區快速回覆
 def food_quick_reply():
@@ -60,42 +43,6 @@ def food_quick_reply():
         )
     )
     return message
-
-# 隨機選店家
-def randomFood(event):
-    #從用戶傳的文字中擷取ftag關鍵字
-    columns=[]
-    filter_text = " "
-    food_entry_list = list(foodTable.objects.all())  #先列出所有食物物件
-    #從物件中一一取出fTag來比對使用者的文字
-    for food_item in food_entry_list:  
-        if food_item.fTag in event.message.text:
-            print(event.message.text +" find "+ food_item.fTag)
-            filter_text = food_item.fTag
-    unit = foodTable.objects.filter( fTag = filter_text ) #過濾資料
-    
-    if unit.exists():
-        print(unit)
-        for item in unit :
-            addCarouselItem(item,columns)
-
-        #如果有5筆以上資料，隨機挑5筆
-        if len(columns)>=5:
-            columns = sample(columns,5)
-
-        carousel_template_message = TemplateSendMessage(alt_text='Carousel template', template=CarouselTemplate(columns=columns))
-        return carousel_template_message
-    else:
-        return False
-
-
-# 輸入 要製作成 Carousel的物件，輸出Carousel物件集合 (最多5個)
-def addCarouselItem(item,columns):
-    url = domain+parse.quote(str(item.fMenuImage).encode('utf-8'))
-    print(url)
-    message = replyCarousel.CarouselReply(item.fUrl,url,item.fName,item.fAddress )
-    columns.append(message)
-    return None
 
 
 ###飲食區功能###
@@ -133,7 +80,6 @@ def foodArea(event):
             line_bot_api.reply_message(event.reply_token,TemplateSendMessage(
                 alt_text='Carousel template',template=CarouselTemplate(columns=columns)) )
 
-
     elif event.message.type=='location':  #距離推薦
         food_entry_list = list(foodTable.objects.all()) #取出所有food資料
         #計算自己與所有店家的距離
@@ -159,10 +105,67 @@ def foodArea(event):
 
 
 
-#Ubike 資訊
-def searchUbike(request):
-    ubikeInfo = getUbikeInfo()
-    return render(request, "searchUbike.html", locals())
+# show 資料表
+def listfoodTable(request):
+    allfoods = foodTable.objects.all().order_by('id')
+    return render(request, "listfoodTable.html", locals())
+
+
+#菜單搜尋
+def searchMenu(request):
+    allfoods  = foodTable.objects.all().order_by('id')
+    if 'fTag' in request.GET:
+        allfoods = foodTable.objects.filter( fTag = request.GET['fTag'] )
+        return render(request, "searchMenu.html", locals())
+    else:
+        allfoods = foodTable.objects.all().order_by('id')
+
+    if 'fName' in request.GET:
+        f_menu = foodTable.objects.filter( fName = request.GET['fName'] )
+        return render(request, "searchMenu.html", locals())
+    else:
+        allfoods = foodTable.objects.all().order_by('id')
+        return render(request, "searchMenu.html", locals())
+
+
+# 隨機選店家
+def randomFood(event):
+    #從用戶傳的文字中擷取ftag關鍵字
+    columns=[]
+    filter_text = " "
+    food_entry_list = list(foodTable.objects.all())  #先列出所有食物物件
+    #從物件中一一取出fTag來比對使用者的文字
+    for food_item in food_entry_list:  
+        if food_item.fTag in event.message.text:
+            print(event.message.text +" find "+ food_item.fTag)
+            filter_text = food_item.fTag
+    unit = foodTable.objects.filter( fTag = filter_text ) #過濾資料
+    
+    if unit.exists():
+        print(unit)
+        for item in unit :
+            addCarouselItem(item,columns)
+
+        #如果有5筆以上資料，隨機挑5筆
+        if len(columns)>=5:
+            columns = sample(columns,5)
+
+        carousel_template_message = TemplateSendMessage(alt_text='Carousel template', template=CarouselTemplate(columns=columns))
+        return carousel_template_message
+    else:
+        return False
+
+
+# 輸入 要製作成 Carousel的物件，輸出Carousel物件集合 (最多5個)
+def addCarouselItem(item,columns):
+    url = domain+parse.quote(str(item.fMenuImage).encode('utf-8'))
+    print(url)
+    message = replyCarousel.CarouselReply(item.fUrl,url,item.fName,item.fAddress )
+    columns.append(message)
+    return None
+
+###上方為飲食區功能###
+
 
 
 # 交通區快速回覆
@@ -174,6 +177,7 @@ def traffic_quick_reply():
             QuickReplyButton(action=MessageAction(label="公車資訊",text="/公車資訊")),#回傳文字
             QuickReplyButton(action=URIAction(label="Ubike資訊",uri='https://liff.line.me/1655990146-0DxGKVrq',
              alt_uri='https://liff.line.me/1655990146-0DxGKVrq')),#網頁連結
+            QuickReplyButton(action=PostbackAction(label="校園地圖",data="campusMap=True")),#回傳文字
             ]
         )
     )
@@ -196,6 +200,23 @@ def trafficArea(event):
     return None
 
 
+#Ubike 資訊
+def searchUbike(request):
+    ubikeInfo = getUbikeInfo()
+    return render(request, "searchUbike.html", locals())
+
+
+def sendBack_map(event, backdata): #Postback
+    try:
+        message = ImageSendMessage(
+            original_content_url='https://alumni.cycu.edu.tw/alumni/upload/editor/pic/%E6%A0%A1%E5%8D%80%E5%B9%B3%E9%9D%A2%E5%9C%96.jpg', 
+            preview_image_url='https://alumni.cycu.edu.tw/alumni/upload/editor/pic/%E6%A0%A1%E5%8D%80%E5%B9%B3%E9%9D%A2%E5%9C%96.jpg')
+        line_bot_api.reply_message(event.reply_token, message)
+    except:
+        line_bot_api.reply_message (event.reply_token, TextSendMessage(text='發生錯誤!'))
+
+
+###上方為交通區功能###
 
 foodAreaList =['/飲食區','/時段推薦','/菜單搜尋'] #飲食區功能列表
 trafficAreaList =['/交通區'] #交通區功能列表
@@ -243,6 +264,10 @@ def callback(request):
                     #進入飲食區功能
                     foodArea(event)
                     
+            if isinstance(event, PostbackEvent):  #PostbackTemplateAction觸發此事件
+                backdata = dict(parse_qsl(event.postback.data))  #取得Postback資料
+                if backdata.get('campusMap') == 'True':
+                    sendBack_map(event,backdata)
             
         return HttpResponse()
     else:
