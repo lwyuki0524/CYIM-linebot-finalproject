@@ -1,51 +1,125 @@
 <!DOCTYPE html>
 <html lang="en">
-
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://bootswatch.com/5/lumen/bootstrap.min.css" integrity="sha384-GzaBcW6yPIfhF+6VpKMjxbTx6tvR/yRd/yJub90CqoIn2Tz4rRXlSpTFYMKHCifX" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@4.5.2/dist/lumen/bootstrap.css">
     <head>
         <meta charset="UTF-8">
         <title>菜單搜尋</title>
         <style>
+            body{
+                background:rgb(244,244,244) !important;
+            }
             *{
-                font-size: 50px;
+                font-size: 50px !important;
             }
-            button{
+            form button{
+                padding:20px 2px !important;
                 height: 100px;
-                padding: 10px 15px;
+                width:20%;
+                height:auto;
+                background: white !important;
             }
-            img{
-                width: 900px;
+            form div{
+                font-size:45px !important;
+                text-align-last:justify;
+                color:rgb(217,161,17);
+                padding:10px 0px;
+                margin: 0px 40px;
             }
+            .mark{
+                position: absolute;
+                width:10px;
+                height:50px;
+                padding: 4px;
+                margin:18px 0;
+                background: #ffb800;
 
+            }
+            .btn-warning{
 
+                background: #ffb800;
+
+            }
+            .ch-menu{
+                margin-top: 1rem;
+                position: relative;
+                text-align: center;
+            }
+            .menu{
+                width: 85%;
+                height:auto;
+                border:1px black;
+                box-shadow: 0px 0px 15px  gray;
+            }
+            option{
+                font-size: 45px !important;
+            }
+            h2{
+                position: absolute;
+                top:70px;
+                font-weight: bold;
+                width: 100%;
+            }
+            .title{
+                width: 90%;
+                height: 190px;
+                margin-bottom: 30px;
+                object-fit: cover;  
+            }
         </style>
     </head>
     <body>
-        <h1>菜單搜尋 {{errormessage}}</h1>
+        <b>{{errormessage}}</b>
+        <form action=""  method="get" class="text-center mt-1">
+            <button name="fTag" type="submit" value="早餐" class="iconfont icon-breakfast1 btn m-1">
+                <div class="mark"></div>
+                <div>早餐</div>
+                <img src="https://img-premium.flaticon.com/png/512/887/887396.png?token=exp=1621947780~hmac=17e85f0bbfd666256766f238f37a23f7" style="width:120px;">
+            </button>
+            <button name="fTag" type="submit" value="午餐" class="iconfont icon-breakfast1 btn m-1">
+                <div class="mark"></div>
+                <div>午餐</div>
+                <img src="https://img-premium.flaticon.com/png/512/3978/3978721.png?token=exp=1621947912~hmac=1f65d8d27dec1a2ef3297da40174ad58" style="width:120px;">
+            </button>
+            <button name="fTag" type="submit" value="點心" class="iconfont icon-breakfast1 btn m-1">
+                <div class="mark"></div>
+                <div>點心</div>
+                <img src="https://img-premium.flaticon.com/png/512/3075/3075717.png?token=exp=1621948886~hmac=d4042fffc37dba735c39bf12f9b0b367" style="width:120px;">
+            </button>
+            <button name="fTag" type="submit" value="飲料" class="iconfont icon-breakfast1 btn m-1">
+                <div class="mark"></div>
+                <div>飲料</div>
+                <img src="https://image.flaticon.com/icons/png/512/3081/3081170.png" style="width:120px;">
+            </button>
 
-        <form action=""  method="get">
-            <h4>分類</h4>
-            <button name="fTag" type="submit" value="早餐">早餐</button>
-            <button name="fTag" type="submit" value="午餐">午餐</button>
-            <button name="fTag" type="submit" value="點心">點心</button>
-            <button name="fTag" type="submit" value="飲料">飲料</button>
+            <div class="container-fluid px-3">
+                <div class="row pt-2 mx-auto">
+                    <select name="fName" class="form-control col-9 px-4" style="font-size: 40px !important;">
+                        <option value="">請選擇餐廳</option>
+                        {% for foodTable in allfoods %}
+                        <option value='{{foodTable.fName}}'>{{foodTable.fName}}</option>
+                        {% endfor %}
+                    </select>    
+                    <input type="submit" class="btn btn-warning btn-sm col-2 ml-3" value="搜尋" style="font-size: 40px !important;">
 
-            <h4>餐廳</h4>
-            <select name="fName">
-                <option value="">請選擇餐廳</option>
-                {% for foodTable in allfoods %}
-                    <option value='{{foodTable.fName}}'>{{foodTable.fName}}</option>
-                {% endfor %}
-            </select>
-            
-            <input type="submit" value="搜尋">
+                </div>
+            </div>
         </form>
-        
+
+
         {% for food in f_menu %}
-            <h3>{{food.fName}} - 菜單 </h3>
-            <img src='https://res.cloudinary.com/lwyuki/image/upload/v1/{{food.fMenuImage}}' alt="">
+
+        <div class="ch-menu">
+            <h2>{{food.fName}} - 菜單</h2>
+            <img  class="title" src="http://pic.51yuansu.com/pic3/cover/01/86/93/59818cb027529_610.jpg">
+            <br>
+            <!-- <img class="menu" src='https://imgur.dcard.tw/ENikbW9h.jpg'> -->
+            <img class="menu" src='https://res.cloudinary.com/lwyuki/image/upload/v1/{{food.fMenuImage}}'>
+            <br>
+        </div>
         {% endfor %}
-
-        
     </body>
-
 </html>
