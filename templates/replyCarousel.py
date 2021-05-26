@@ -2,64 +2,180 @@ from linebot.models import CarouselColumn,URIAction,FlexSendMessage
 from linebot.models.flex_message import BubbleContainer, CarouselContainer
 
 def FlexReply(webUrl,imgUrl,name,address):
+
     bubble = {
       "type": "bubble",
-      "size": "micro",
-      "hero": {
-        "type": "image",
-        "url": imgUrl,
-        "size": "full",
-        "aspectMode": "cover",
-        "aspectRatio": "320:213"
-      },
+      "header": {
+      "type": "box",
+      "layout": "vertical",
+      "contents": [
+        {
+          "type": "box",
+          "layout": "vertical",
+          "contents": [
+            {
+              "type": "image",
+              "url": imgUrl,
+              "size": "full",
+              "aspectMode": "cover",
+              "aspectRatio": "150:120",
+              "gravity": "center",
+              "flex": 1
+            },
+            {
+              "type": "box",
+              "layout": "vertical",
+              "contents": [
+                {
+                  "type": "text",
+                  "text": name,
+                  "position": "relative",
+                  "align": "center",
+                  "offsetTop": "45%",
+                  "size": "25px",
+                  "adjustMode": "shrink-to-fit",
+                  "weight": "bold",
+                  "color": "#ffffffdf"
+                }
+              ],
+              "backgroundColor": "#00000060",
+              "position": "absolute",
+              "offsetBottom": "0px",
+              "offsetStart": "0px",
+              "offsetEnd": "0px",
+              "paddingAll": "20px",
+              "offsetTop": "0px"
+            }
+          ]
+        }
+      ],
+      "paddingAll": "0px"
+    },
       "body": {
-        "type": "box",
-        "layout": "vertical",
+        "backgroundColor": "#ffffff",
         "contents": [
           {
-            "type": "text",
-            "text": name,
-            "weight": "bold",
-            "size": "sm",
-            "wrap": True
-          },
-          {
-            "type": "box",
-            "layout": "vertical",
             "contents": [
               {
-                "type": "box",
-                "layout": "baseline",
-                "spacing": "sm",
                 "contents": [
                   {
+                    "color": "#00000077",
+                    "offsetStart": "1px",
+                    "offsetTop": "1px",
+                    "position": "absolute",
+                    "size": "25px",
+                    "text": "▎",
+                    "type": "text"
+                  },
+                  {
+                    "color": "#ffcc00",
+                    "position": "absolute",
+                    "size": "25px",
+                    "text": "▎",
+                    "type": "text"
+                  },
+                  {
+                    "color": "#000000",
+                    "offsetStart": "20px",
+                    "size": "24px",
+                    "text": name,
                     "type": "text",
-                    "text": address,
-                    "wrap": True,
-                    "color": "#8c8c8c",
-                    "size": "xs",
-                    "flex": 5
+                    "weight": "bold",
+                    "wrap": True
                   }
-                ]
+                ],
+                "layout": "vertical",
+                "spacing": "sm",
+                "type": "box"
+              },
+              {
+                "contents": [
+                  {
+                    "color": "#000000",
+                    "size": "sm",
+                    "text": address,
+                    "type": "text",
+                    "weight": "bold",
+                    "wrap": True
+                  }
+                ],
+                "layout": "vertical",
+                "margin": "sm",
+                "paddingAll": "10px",
+                "type": "box"
               }
-            ]
+            ],
+            "layout": "vertical",
+            "type": "box"
           },
           {
-            "type": "button",
-            "action": {
-              "type": "uri",
-              "label": "網站",
-              "uri": webUrl
-            }
+            "contents": [
+              {
+                "backgroundColor": "#E5AF00",
+                "contents": [
+                  {
+                    "action": {
+                      "label": "  ",
+                      "type": "uri",
+                      "uri": webUrl
+                    },
+                    "adjustMode": "shrink-to-fit",
+                    "color": "#ffffff",
+                    "height": "sm",
+                    "margin": "5px",
+                    "position": "relative",
+                    "style": "link",
+                    "type": "button"
+                  }
+                ],
+                "cornerRadius": "20px",
+                "layout": "horizontal",
+                "margin": "10px",
+                "position": "absolute",
+                "type": "box",
+                "width": "100%"
+              },
+              {
+                "contents": [
+                  {
+                    "align": "center",
+                    "color": "#ffffff",
+                    "size": "20px",
+                    "text": "網　站",
+                    "type": "text",
+                    "weight": "bold"
+                  }
+                ],
+                "cornerRadius": "20px",
+                "layout": "vertical",
+                "margin": "10px",
+                "offsetBottom": "4px",
+                "position": "relative",
+                "type": "box",
+                "width": "50%",
+                "offsetStart": "25%"
+              }
+            ],
+            "layout": "vertical",
+            "position": "relative",
+            "type": "box",
+            "width": "100%",
+            "offsetTop": "sm",
+            "height": "40%"
           }
         ],
-        "spacing": "sm",
-        "paddingAll": "13px"
+        "layout": "vertical",
+        "paddingAll": "20px",
+        "type": "box"
+      },
+      "styles": {
+        "hero": {
+          "backgroundColor": "#ffffff"
+        }
       }
-    } 
-    message = CarouselContainer(alt_text='CarouselContainer', contents=bubble) 
-    #print(message)
-    return bubble
+    }
+    message = FlexSendMessage(alt_text='FlexSendMessage', contents=bubble) 
+    return message
 
 def CarouselReply(webUrl,imgUrl,name,address):
     message = CarouselColumn(

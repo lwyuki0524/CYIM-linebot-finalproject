@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from linebot.models.actions import PostbackAction, URIAction
 from linebot.models.events import PostbackEvent
+from linebot.models.flex_message import FlexContainer
 from linebot.models.send_messages import ImageSendMessage
 from cyimapp.models import foodTable
 from django.conf import settings
@@ -9,7 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from linebot import LineBotApi, WebhookParser
 from linebot.exceptions import InvalidSignatureError, LineBotApiError
-from linebot.models import MessageEvent, TextSendMessage,TemplateSendMessage,CarouselTemplate,QuickReply, messages
+from linebot.models import MessageEvent, TextSendMessage,TemplateSendMessage,CarouselTemplate,QuickReply, messages,FlexSendMessage
 from linebot.models import QuickReplyButton,MessageAction,LocationAction
 from urllib import parse#中文URL轉碼
 from urllib.parse import parse_qsl
@@ -25,7 +26,7 @@ from random import sample
 line_bot_api = LineBotApi(settings.LINE_CHANNEL_ACCESS_TOKEN)
 parser = WebhookParser(settings.LINE_CHANNEL_SECRET)
 
-#domain = 'https://d211f4ba3888.ngrok.io'+'/' #本地端網域       #### 測試時請使用這個(註解下方的domain)####
+#domain = 'https://852cde381e58.ngrok.io'+'/' #本地端網域       #### 測試時請使用這個(註解下方的domain)####
 domain = 'https://res.cloudinary.com/lwyuki/image/upload/v1'+'/'#### cloudinary網域(上傳github請使用這個) ####
 
 
@@ -76,9 +77,14 @@ def foodArea(event):
                 unit = foodTable.objects.filter( id = foodid ) # 找出有營業店家的資料
                 for item in unit:
                     addCarouselItem(item,columns)
-             #傳回5筆以內有在營業的店家
-            line_bot_api.reply_message(event.reply_token,TemplateSendMessage(
-                alt_text='Carousel template',template=CarouselTemplate(columns=columns)) )
+            
+            message =  {
+                "type": "carousel",
+                "contents": columns
+            }
+            message = FlexSendMessage(alt_text="test",contents=message)
+            #傳回5筆以內有在營業的店家
+            line_bot_api.reply_message(event.reply_token,message )
 
     elif event.message.type=='location':  #距離推薦
         food_entry_list = list(foodTable.objects.all()) #取出所有food資料
@@ -97,10 +103,15 @@ def foodArea(event):
             unit = foodTable.objects.filter( id = foodDict[0] ) #過濾資料
             for item in unit:
                 addCarouselItem(item,columns)
-
+        
+        message =  {
+            "type": "carousel",
+            "contents": columns
+        }
+        message = FlexSendMessage(alt_text="test",contents=message)
+        print(message)
         #傳回5個最近的店家
-        line_bot_api.reply_message(event.reply_token,TemplateSendMessage(
-            alt_text='Carousel template',template=CarouselTemplate(columns=columns)) )
+        line_bot_api.reply_message(event.reply_token,message)
     return None
 
 
@@ -145,13 +156,11 @@ def randomFood(event):
         print(unit)
         for item in unit :
             addCarouselItem(item,columns)
-
         #如果有5筆以上資料，隨機挑5筆
         if len(columns)>=5:
             columns = sample(columns,5)
 
-        carousel_template_message = TemplateSendMessage(alt_text='Carousel template', template=CarouselTemplate(columns=columns))
-        return carousel_template_message
+        return columns
     else:
         return False
 
@@ -160,8 +169,8 @@ def randomFood(event):
 def addCarouselItem(item,columns):
     url = domain+parse.quote(str(item.fMenuImage).encode('utf-8'))
     print(url)
-    message = replyCarousel.CarouselReply(item.fUrl,url,item.fName,item.fAddress )
-    columns.append(message)
+    message = replyCarousel.FlexReply(item.fUrl,url,item.fName,item.fAddress )
+    columns.append(message.contents)
     return None
 
 ###上方為飲食區功能###
@@ -253,8 +262,13 @@ def callback(request):
                             text='https://liff.line.me/'+'1655990146-npeZ9k20') )
                     #如果收到分類的關鍵字，隨機傳店家資訊(測試用)
                     elif randomFood(event):
-                        carousel_template_message=randomFood(event)
-                        line_bot_api.reply_message(event.reply_token, carousel_template_message)
+                        column=randomFood(event)
+                        message =  {
+                            "type": "carousel",
+                            "contents": column
+                        }
+                        message = FlexSendMessage(alt_text="test",contents=message)
+                        line_bot_api.reply_message(event.reply_token, message)
                     #鸚鵡回話
                     else:
                         line_bot_api.reply_message(event.reply_token,TextSendMessage(text = event.message.text) )
@@ -272,3 +286,4 @@ def callback(request):
         return HttpResponse()
     else:
         return HttpResponseBadRequest()
+
