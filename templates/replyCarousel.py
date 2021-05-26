@@ -143,7 +143,11 @@ def FlexReply(webUrl,imgUrl,name,address):
                     "size": "20px",
                     "text": "網　站",
                     "type": "text",
-                    "weight": "bold"
+                    "weight": "bold",
+                    "action": {
+                      "type": "uri",
+                      "uri": webUrl
+                    }
                   }
                 ],
                 "cornerRadius": "20px",
