@@ -31,7 +31,7 @@ def FlexReply(webUrl,imgUrl,name,address):
                   "text": name,
                   "position": "relative",
                   "align": "center",
-                  "offsetTop": "45%",
+                  "offsetTop": "35%",
                   "size": "25px",
                   "adjustMode": "shrink-to-fit",
                   "weight": "bold",

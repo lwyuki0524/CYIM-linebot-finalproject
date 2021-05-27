@@ -1,56 +1,94 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@4.5.2/dist/journal/bootstrap.css">
     <title>Ubike 資訊</title>
     <style>
-        body{
-            background-color: #333849; /*#414964;*/
-        }
-        h1{
-            text-align: center;
-            color: aliceblue;
-        }
-        table{
-            margin: auto;
-            color: aliceblue;
-        }
-        .name{
-            font-size: 22px;
-            padding: 5px;
-        }
-        .input{
-            text-align: center;
-            padding: 15px;
-        }
+      body{
+        background:rgb(249, 249, 249) !important; 
+      }
+      h3{
+        color:#239374;
+        text-align: center;
+      }
+      .input{
+        padding: 15px;
+      }
+      input{
+        margin: auto;
+        width:70% !important;
+      }
+      th{
+        background: #31cca2;
+        color: white;
+        letter-spacing: 1px;
+        border: none !important;
+        vertical-align: middle !important;
+      }
+      th:first-child{
+        border-radius: 8px 0 0 8px;
+      }
+      th:last-child{
+        border-radius: 0 8px 8px 0;
+      }
+      td{
+        font-size: 15px;
+        border: none !important; 
+      }
+      tr:nth-child(odd){
+        background:#fff;
+      }
+      tr:nth-child(even){
+        background:#e8faf6;
+      }
+      td:first-child{
+        font-weight: bold;
+        border-radius: 5px 0 0 5px;
+      }
+      td:last-child{
+        border-radius: 0 5px 5px 0;
+      }
     </style>
 </head>
 <body>
-    <h1>桃園 Ubike 資訊 {{errormessage}}</h1>
-    <div class="input">
-        <input type="search" class="light-table-filter" data-table="order-table" placeholder="請輸入關鍵字">
+    <h3 class="my-3">桃園 Ubike 資訊{{errormessage}}</h3> 
+    
+    <div class="mx-3 form-group">
+        <input type="search" class="light-table-filter form-control" data-table="order-table" placeholder="請輸入站名">
     </div>
 
-    <table class="order-table" cellpadding="2" cellspacing="2" border="1">
-        <thead>
-            <th>站名</th>
-            <th>可租借數</th>
-            <th>可停車位</th>
-        </thead>
 
-        <tbody>
+
+
+<div class="container mt-4">
+    <table class="table table-hover order-table" cellpadding="0" cellspacing="0" border="0">
+
+      <thead class=" table-light table-striped">
+        <tr>
+          <th scope="col">站名</th>
+          <th scope="col">可供<br>租借</th>
+          <th scope="col">可停<br>車位</th>
+        </tr>
+      </thead>
+
+      <tbody>
             {% for key,value in ubikeInfo.items %}
-            <tr>
-            <td class="name">{{ value.1 }}</td>
-            <td>{{ value.2 }}</td>
-            <td>{{ value.3 }}</td>
-            </tr>
+        <tr>
+          <td class="name" scope="row">{{ value.1 }}</td>
+          <td>{{ value.2 }}</td>
+          <td>{{ value.3 }}</td>
+        </tr>
+
+
+
             {% endfor %}
-        </tbody>
-        
-      </table>
+      </tbody>
+    </table>
+</div>
+
 
       <script>
         //壓縮後的程式碼
