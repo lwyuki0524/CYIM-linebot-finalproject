@@ -1,4 +1,4 @@
-import urllib
+import urllib.request
 from apscheduler.schedulers.blocking import BlockingScheduler
 #from cyimapp.views import modifyUbike
 import datetime
