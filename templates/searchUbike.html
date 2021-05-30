@@ -73,18 +73,25 @@
           <th scope="col">可停<br>車位</th>
         </tr>
       </thead>
-
+      
       <tbody>
-            {% for key,value in ubikeInfo.items %}
+            {% for bike in ubikeInfo %}
         <tr>
-          <td class="name" scope="row">{{ value.1 }}</td>
-          <td>{{ value.2 }}</td>
-          <td>{{ value.3 }}</td>
+          <td class="name" scope="row">{{ bike.sna }}</td>
+          <td>{{ bike.sbi }}</td>
+          <td>{{ bike.bemp }}</td>
         </tr>
-
-
-
             {% endfor %}
+            <!--
+              
+          <p style="text-align: center;">資料讀取超時</p>
+          <form action=""  method="get">
+            <div style="text-align: center;margin: 10px;">
+              <button name="reload" value="reload" type="submit" >重新載入</button>
+            </div>
+          </form>
+          
+            -->
       </tbody>
     </table>
 </div>

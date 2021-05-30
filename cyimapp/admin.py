@@ -1,5 +1,5 @@
 from django.contrib import admin
-from cyimapp.models import foodTable
+from cyimapp.models import foodTable,UbikeData
 
 # Register your models here.
 
@@ -9,4 +9,11 @@ class foodadmin(admin.ModelAdmin):
     search_fields = ('fName',)
     ordering = ('id',)
 
+class Ubikeadmin(admin.ModelAdmin):
+    list_display = ('id', 'sno', 'sna', 'sbi','bemp')
+    list_filter = ('sno','sna')
+    search_fields = ('sna',)
+    ordering = ('id',)
+
 admin.site.register(foodTable, foodadmin)
+admin.site.register(UbikeData, Ubikeadmin)

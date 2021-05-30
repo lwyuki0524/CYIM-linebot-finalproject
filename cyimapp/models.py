@@ -13,3 +13,11 @@ class foodTable(models.Model):
     fEndTime = models.TimeField(null=True) 
     def __str__(self):
         return self.fName
+
+class UbikeData(models.Model):
+    sno = models.CharField(max_length = 10, null = False ) #代號
+    sna = models.CharField(max_length = 20, null = False ) #場站名稱
+    sbi = models.CharField(max_length = 20, null = False ) #可租借數
+    bemp = models.CharField(max_length = 20, null = False )  #空位數
+    def __str__(self):
+        return self.sno

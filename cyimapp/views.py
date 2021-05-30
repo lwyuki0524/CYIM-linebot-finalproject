@@ -3,7 +3,7 @@ from linebot.models.actions import PostbackAction, URIAction
 from linebot.models.events import PostbackEvent
 from linebot.models.flex_message import FlexContainer
 from linebot.models.send_messages import ImageSendMessage
-from cyimapp.models import foodTable
+from cyimapp.models import foodTable,UbikeData
 from django.conf import settings
 from django.http import HttpResponse,HttpResponseBadRequest,HttpResponseForbidden
 from django.views.decorators.csrf import csrf_exempt
@@ -17,16 +17,18 @@ from urllib.parse import parse_qsl
 from templates import replyCarousel
 
 from cyimapp.myLibrary.distance import haversine #計算距離
-from cyimapp.myLibrary.real_ubike import getUbikeInfo #取得Ubike資訊
+from cyimapp.myLibrary.real_ubike import getUbikeInfo,loadData #取得Ubike資訊
 from datetime import datetime, time
 import time
 from random import sample
+import requests
+import json
 
 # Create your views here.
 line_bot_api = LineBotApi(settings.LINE_CHANNEL_ACCESS_TOKEN)
 parser = WebhookParser(settings.LINE_CHANNEL_SECRET)
 
-#domain = 'https://188fbbdf64f5.ngrok.io'+'/' #本地端網域       #### 測試時請使用這個(註解下方的domain)####
+#domain = 'https://4bcd31930e5c.ngrok.io'+'/' #本地端網域       #### 測試時請使用這個(註解下方的domain)####
 domain = 'https://res.cloudinary.com/lwyuki/image/upload/v1'+'/'#### cloudinary網域(上傳github請使用這個) ####
 
 
@@ -175,7 +177,43 @@ def addCarouselItem(item,columns):
 
 ###上方為飲食區功能###
 
+def insertUbike(request):  #新增資料
+    with open("a1b4714b-3b75-4ff8-a8f2-cc377e4eaa0f.json","r",encoding="utf-8") as input_file:
+        data = json.load(input_file)
+        data = data["result"]['records']
+    url = "https://data.tycg.gov.tw/api/v1/rest/datastore/a1b4714b-3b75-4ff8-a8f2-cc377e4eaa0f?format=json"
+    #data = requests.get(url).json()
+    for item in data:
+        sno = item["sno"]    #代號
+        sna = item["sna"]    #場站名稱
+        sbi = item["sbi"]    #可租借數
+        bemp = item["bemp"]  #空位數
+        unit = UbikeData.objects.create(sno=sno, sna=sna, sbi=sbi, bemp=bemp) 
+        unit.save()  #寫入資料庫
+    D_bike = UbikeData.objects.all().order_by('id')  #讀取資料表, 依 id 遞減排序
+    return render(request, "listUbike.html", locals())
 
+def modifyUbike(request):  #修改資料
+    #with open("a1b4714b-3b75-4ff8-a8f2-cc377e4eaa0f.json","r",encoding="utf-8") as input_file:
+    #    data = json.load(input_file)
+    #    data = data["result"]['records']
+    try:
+        url = "https://data.tycg.gov.tw/api/v1/rest/datastore/a1b4714b-3b75-4ff8-a8f2-cc377e4eaa0f?format=json"
+        data = requests.get(url).json()
+        data = data["result"]['records']
+    except:
+        data = None
+    if data:
+        for item in data:
+            unit = UbikeData.objects.get(sno=item["sno"])
+            unit.sbi = item["sbi"]    #可租借數
+            unit.bemp = item["bemp"]  #空位數
+            unit.save()  #寫入資料庫
+        D_bike = UbikeData.objects.all().order_by('id')  #讀取資料表, 依 id 遞減排序
+        return render(request, "listUbike.html", locals())
+    else:
+        ubikeInfo  = UbikeData.objects.all().order_by('id')
+        return render(request, "searchUbike.html", locals())
 
 # 交通區快速回覆
 def traffic_quick_reply():
@@ -211,8 +249,19 @@ def trafficArea(event):
 
 #Ubike 資訊
 def searchUbike(request):
-    ubikeInfo = getUbikeInfo()
+    ubikeInfo  = UbikeData.objects.all().order_by('id')
     return render(request, "searchUbike.html", locals())
+    """
+    if 'reload' in request.GET:
+        loadData()
+        ubikeInfo = getUbikeInfo()
+        return render(request, "searchUbike.html", locals())
+    else:
+        ubikeInfo = getUbikeInfo()
+        return render(request, "searchUbike.html", locals())
+    """
+
+
 
 
 #傳送校園地圖

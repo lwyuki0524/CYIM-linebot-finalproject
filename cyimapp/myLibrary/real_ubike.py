@@ -1,28 +1,55 @@
 from linebot.models import messages
 import requests
+import time
 import json
+import random
 from cyimapp.myLibrary.distance import haversine #計算距離
+
+data = None
 url = "https://data.tycg.gov.tw/opendata/datalist/datasetMeta/download?id=5ca2bfc7-9ace-4719-88ae-4034b9a5a55c&rid=a1b4714b-3b75-4ff8-a8f2-cc377e4eaa0f"
+#data = requests.get(url).json()
+"""
+url = "https://data.tycg.gov.tw/api/v1/rest/datastore/a1b4714b-3b75-4ff8-a8f2-cc377e4eaa0f?format=json"
 data = requests.get(url).json()
+for item in data:
+    sno = item["sno"]    #代號
+    sna = item["sna"]    #場站名稱
+    sbi = item["sbi"]    #可租借數
+    bemp = item["bemp"]  #空位數
+
+print("載入Ubike資料...")
+try:
+    data = requests.get(url,15).json()
+    data = data["result"]['records']
+except requests.exceptions.RequestException as e:
+    print(e)
+    print(time.strftime('%Y-%m-%d %H:%M:%S'))
+    print("讀取超時")
+except:
+    print("資料來源錯誤")
+"""
+
 
 #取得所有桃園Ubike資料
 def getUbikeInfo():
     
     listData =[]
-
     ubike_info = {} # 站代號: [此站資料,我的距離]
+    if data :
+        for item in data:
+            sno = item["sno"]    #代號
+            sna = item["sna"]    #場站名稱
+            sbi = item["sbi"]    #可租借數
+            bemp = item["bemp"]  #空位數
 
-    for key, value in data["retVal"].items():
-        sno = value["sno"]    #代號
-        sna = value["sna"]    #場站名稱
-        sbi = value["sbi"]    #可租借數
-        bemp = value["bemp"]  #空位數
+            lat = item["lat"]    #緯度
+            lng = item["lng"]    #經度
+            
+            listData=[sno ,sna ,sbi ,bemp]
+            ubike_info.update( {sno : listData})
+    else:
+        ubike_info = None
 
-        lat = value["lat"]    #緯度
-        lng = value["lng"]    #經度
-        
-        listData=[sno ,sna ,sbi ,bemp]
-        ubike_info.update( {sno : listData})
 
     text ="站名\t  可租借數\t  可停車位\n"
     text +="----------------------------------------------"
@@ -33,6 +60,18 @@ def getUbikeInfo():
     return ubike_info
 
 
+def loadData():
+    try:
+        data = requests.get(url,25).json()
+        data = data["result"]['records']
+    except requests.exceptions.RequestException as e:
+        print(e)
+        print(time.strftime('%Y-%m-%d %H:%M:%S'))
+        print("讀取超時")
+    except:
+        print("資料來源錯誤")
+
+    print("載入Ubike資料...")
 
 #找離自己最近的10筆資料
 def getUbikeData(myLongitude, myLatitude):
