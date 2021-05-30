@@ -193,7 +193,7 @@ def insertUbike(request):  #新增資料
     D_bike = UbikeData.objects.all().order_by('id')  #讀取資料表, 依 id 遞減排序
     return render(request, "listUbike.html", locals())
 
-def modifyUbike():  #修改資料
+def modifyUbike(request):  #修改資料
     #with open("a1b4714b-3b75-4ff8-a8f2-cc377e4eaa0f.json","r",encoding="utf-8") as input_file:
     #    data = json.load(input_file)
     #    data = data["result"]['records']
@@ -209,11 +209,11 @@ def modifyUbike():  #修改資料
             unit.sbi = item["sbi"]    #可租借數
             unit.bemp = item["bemp"]  #空位數
             unit.save()  #寫入資料庫
-        #D_bike = UbikeData.objects.all().order_by('id')  #讀取資料表, 依 id 遞減排序
-        #return render(request, "listUbike.html", locals())
-    #else:
-        #ubikeInfo  = UbikeData.objects.all().order_by('id')
-        #return render(request, "searchUbike.html", locals())
+        D_bike = UbikeData.objects.all().order_by('id')  #讀取資料表, 依 id 遞減排序
+        return render(request, "listUbike.html", locals())
+    else:
+        ubikeInfo  = UbikeData.objects.all().order_by('id')
+        return render(request, "searchUbike.html", locals())
 
 # 交通區快速回覆
 def traffic_quick_reply():
