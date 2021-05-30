@@ -1,6 +1,6 @@
 import urllib
 from apscheduler.schedulers.blocking import BlockingScheduler
-from cyimapp.views import modifyUbike
+#from cyimapp.views import modifyUbike
 import datetime
 
 sched = BlockingScheduler()
