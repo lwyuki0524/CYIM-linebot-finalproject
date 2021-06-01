@@ -28,7 +28,7 @@ import json
 line_bot_api = LineBotApi(settings.LINE_CHANNEL_ACCESS_TOKEN)
 parser = WebhookParser(settings.LINE_CHANNEL_SECRET)
 
-#domain = 'https://7528df44ba2f.ngrok.io'+'/' #本地端網域       #### 測試時請使用這個(註解下方的domain)####
+#domain = 'https://334728d20ecd.ngrok.io'+'/' #本地端網域       #### 測試時請使用這個(註解下方的domain)####
 domain = 'https://res.cloudinary.com/lwyuki/image/upload/v1'+'/'#### cloudinary網域(上傳github請使用這個) ####
 
 
@@ -177,7 +177,18 @@ def addCarouselItem(item,columns):
 
 ###上方為飲食區功能###
 
-def insertUbike(request):  #新增資料
+
+###交通區功能###
+def trafficArea(event):
+    if event.message.type=='text':    
+        #如果收到/交通區，傳快速回覆訊息
+        if event.message.text=='/交通區':
+            line_bot_api.reply_message(event.reply_token,traffic_quick_reply() )
+
+    return None
+
+
+def insertUbike(request):  #第一次新增資料
     with open("a1b4714b-3b75-4ff8-a8f2-cc377e4eaa0f.json","r",encoding="utf-8") as input_file:
         data = json.load(input_file)
         data = data["result"]['records']
@@ -209,7 +220,7 @@ def modifyUbike(request):  #修改資料
             unit.sbi = item["sbi"]    #可租借數
             unit.bemp = item["bemp"]  #空位數
             unit.save()  #寫入資料庫
-        D_bike = UbikeData.objects.all().order_by('id')  #讀取資料表, 依 id 遞減排序
+        D_bike = UbikeData.objects.all().order_by('id')  #讀取資料表, 依 id 排序
         return render(request, "listUbike.html", locals())
     else:
         ubikeInfo  = UbikeData.objects.all().order_by('id')
@@ -221,31 +232,40 @@ def traffic_quick_reply():
         text="請選擇功能",
         quick_reply=QuickReply(
         items=[
-            QuickReplyButton(action=MessageAction(label="公車資訊",text="/公車資訊")),#回傳文字
+            QuickReplyButton(action=PostbackAction(label="公車資訊",data="busInfo=True")),
             QuickReplyButton(action=URIAction(label="Ubike資訊",uri='https://liff.line.me/1655990146-0DxGKVrq',
              alt_uri='https://liff.line.me/1655990146-0DxGKVrq')),#網頁連結
-            QuickReplyButton(action=PostbackAction(label="校園地圖",data="campusMap=True")),#回傳文字
+            QuickReplyButton(action=PostbackAction(label="校園地圖",data="campusMap=True"))
             ]
         )
     )
     return message
 
-###交通區功能###
-def trafficArea(event):
-    if event.message.type=='text':    
-    #如果收到/交通區，傳快速回覆訊息
-        if event.message.text=='/交通區':
-            line_bot_api.reply_message(event.reply_token,traffic_quick_reply() )
+# 公車資訊快速回覆
+def traffic_bus_quick_reply():
+    message=TextSendMessage(
+        text="請選擇功能",
+        quick_reply=QuickReply(
+        items=[
+	        QuickReplyButton(action=PostbackAction(label="時刻表",data="busTimetable=True")),#Postback事件
+            QuickReplyButton(action=URIAction(label="即時規劃",uri='https://liff.line.me/1655990146-mDVw6LaB',
+            alt_uri='https://liff.line.me/1655990146-mDVw6LaB')),#連結「桃園公車動態資訊系統」的LIFF
 
-    #############
-    #
-    #
-    #   todo
-    #
-    #
-    #############
-    return None
+            ]
+        )
+    )
+    return message
 
+
+#傳送時刻表
+def sendBack_bustimetable(event): #Postback
+    try:
+        message = ImageSendMessage(
+            original_content_url='https://res.cloudinary.com/lwyuki/image/upload/v1622563796/static/img/bus/busTimetable_page-0001_ufxph0.jpg', 
+            preview_image_url='https://res.cloudinary.com/lwyuki/image/upload/v1622563796/static/img/bus/busTimetable_page-0001_ufxph0.jpg')
+        line_bot_api.reply_message(event.reply_token, message)
+    except:
+        line_bot_api.reply_message (event.reply_token, TextSendMessage(text='發生錯誤!'))
 
 #Ubike 資訊
 def searchUbike(request):
@@ -331,6 +351,10 @@ def callback(request):
                 backdata = dict(parse_qsl(event.postback.data))  #取得Postback資料
                 if backdata.get('campusMap') == 'True':
                     sendBack_map(event,backdata)
+                if backdata.get('busTimetable') == 'True':
+                    sendBack_bustimetable(event)
+                if backdata.get('busInfo') == 'True':
+                    line_bot_api.reply_message(event.reply_token,traffic_bus_quick_reply() )
             
         return HttpResponse()
     else:
