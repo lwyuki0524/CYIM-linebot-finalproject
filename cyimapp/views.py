@@ -28,7 +28,7 @@ import json
 line_bot_api = LineBotApi(settings.LINE_CHANNEL_ACCESS_TOKEN)
 parser = WebhookParser(settings.LINE_CHANNEL_SECRET)
 
-#domain = 'https://334728d20ecd.ngrok.io'+'/' #本地端網域       #### 測試時請使用這個(註解下方的domain)####
+#domain = 'https://7c4efa7437bd.ngrok.io'+'/' #本地端網域       #### 測試時請使用這個(註解下方的domain)####
 domain = 'https://res.cloudinary.com/lwyuki/image/upload/v1'+'/'#### cloudinary網域(上傳github請使用這個) ####
 
 
@@ -283,6 +283,48 @@ def searchUbike(request):
 
 
 
+#使用說明快速回覆
+def illustration_quick_reply():
+    message=TextSendMessage(
+        text="請選擇功能",
+        quick_reply=QuickReply(
+        items=[
+	        QuickReplyButton(action=PostbackAction(label="食物區",data="illuFood=True")),
+            QuickReplyButton(action=PostbackAction(label="交通區",data="illuTraffic=True")),
+        ]
+        )
+    )
+    return message
+
+#使用說明快速回覆-交通區
+def illuTraffic_quick_reply():
+    message=TextSendMessage(
+        text="請選擇功能",
+        quick_reply=QuickReply(
+        items=[
+	        QuickReplyButton(action=PostbackAction(label="公車資訊",data="illuBus=True")),
+            QuickReplyButton(action=PostbackAction(label="Ubike資訊",data="illuUbike=True")),
+            QuickReplyButton(action=PostbackAction(label="校園地圖",data="illuCamp=True")),
+        ]
+        )
+    )
+    return message
+
+
+#使用說明快速回覆-食物區
+def illuFood_quick_reply():
+    message=TextSendMessage(
+        text="請選擇功能",
+        quick_reply=QuickReply(
+        items=[
+	        QuickReplyButton(action=PostbackAction(label="時段推薦",data="illuTime=True")),
+            QuickReplyButton(action=PostbackAction(label="定位搜尋",data="illuPosi=True")),
+            QuickReplyButton(action=PostbackAction(label="菜單搜尋",data="illuMenu=True")),
+        ]
+        )
+    )
+    return message
+
 
 #傳送校園地圖
 def sendBack_map(event, backdata): #Postback
@@ -324,7 +366,8 @@ def callback(request):
                     #交通區功能
                     elif event.message.text in trafficAreaList :
                         trafficArea(event)
-
+                    elif event.message.text == '/使用說明' :
+                        line_bot_api.reply_message(event.reply_token,illustration_quick_reply() )
                     #如果收到/foodTable，傳資料表(測試用)
                     elif event.message.text=="/foodTable" :
                         line_bot_api.reply_message(event.reply_token,TextSendMessage(
@@ -355,6 +398,71 @@ def callback(request):
                     sendBack_bustimetable(event)
                 if backdata.get('busInfo') == 'True':
                     line_bot_api.reply_message(event.reply_token,traffic_bus_quick_reply() )
+                if backdata.get('illuFood') == 'True':
+                    line_bot_api.reply_message(event.reply_token,illuFood_quick_reply() )
+                if backdata.get('illuTraffic') == 'True':
+                    line_bot_api.reply_message(event.reply_token,illuTraffic_quick_reply() )
+                if backdata.get('illuTime') == 'True':
+                    try:
+                        message = ImageSendMessage(
+                            original_content_url='https://res.cloudinary.com/lwyuki/image/upload/v1623558988/static/img/illustration/%E6%99%82%E6%AE%B5%E6%8E%A8%E8%96%A6_qm3a52.png', 
+                            preview_image_url='https://res.cloudinary.com/lwyuki/image/upload/v1623558988/static/img/illustration/%E6%99%82%E6%AE%B5%E6%8E%A8%E8%96%A6_qm3a52.png')
+                        line_bot_api.reply_message(event.reply_token, message)
+                    except:
+                        line_bot_api.reply_message (event.reply_token, TextSendMessage(text='發生錯誤!'))
+                if backdata.get('illuPosi') == 'True':
+                    try:
+                        message = []
+                        message.append(ImageSendMessage(
+                            original_content_url='https://res.cloudinary.com/lwyuki/image/upload/v1623558987/static/img/illustration/%E5%AE%9A%E4%BD%8D%E6%90%9C%E5%B0%8B1_uvgvsl.png', 
+                            preview_image_url='https://res.cloudinary.com/lwyuki/image/upload/v1623558987/static/img/illustration/%E5%AE%9A%E4%BD%8D%E6%90%9C%E5%B0%8B1_uvgvsl.png'))
+                        message.append(ImageSendMessage(
+                            original_content_url='https://res.cloudinary.com/lwyuki/image/upload/v1623558988/static/img/illustration/%E5%AE%9A%E4%BD%8D%E6%90%9C%E5%B0%8B2_kjnkn9.png', 
+                            preview_image_url='https://res.cloudinary.com/lwyuki/image/upload/v1623558988/static/img/illustration/%E5%AE%9A%E4%BD%8D%E6%90%9C%E5%B0%8B2_kjnkn9.png'))
+                        line_bot_api.reply_message(event.reply_token, message)
+                    except:
+                        line_bot_api.reply_message (event.reply_token, TextSendMessage(text='發生錯誤!'))
+                if backdata.get('illuMenu') == 'True':
+                    try:
+                        message = []
+                        message.append(ImageSendMessage(
+                            original_content_url='https://res.cloudinary.com/lwyuki/image/upload/v1623558987/static/img/illustration/%E8%8F%9C%E5%96%AE%E6%90%9C%E5%B0%8B1_mv9g6m.png', 
+                            preview_image_url='https://res.cloudinary.com/lwyuki/image/upload/v1623558987/static/img/illustration/%E8%8F%9C%E5%96%AE%E6%90%9C%E5%B0%8B1_mv9g6m.png'))
+                        message.append(ImageSendMessage(
+                            original_content_url='https://res.cloudinary.com/lwyuki/image/upload/v1623558993/static/img/illustration/%E8%8F%9C%E5%96%AE%E6%90%9C%E5%B0%8B2_buacuy.png', 
+                            preview_image_url='https://res.cloudinary.com/lwyuki/image/upload/v1623558993/static/img/illustration/%E8%8F%9C%E5%96%AE%E6%90%9C%E5%B0%8B2_buacuy.png'))
+                        line_bot_api.reply_message(event.reply_token, message)
+                    except:
+                        line_bot_api.reply_message (event.reply_token, TextSendMessage(text='發生錯誤!'))
+                if backdata.get('illuBus') == 'True':
+                    try:
+                        message = []
+                        message.append(ImageSendMessage(
+                            original_content_url='https://res.cloudinary.com/lwyuki/image/upload/v1623558987/static/img/illustration/%E5%85%AC%E8%BB%8A%E8%B3%87%E8%A8%8A1_sbn6tb.png', 
+                            preview_image_url='https://res.cloudinary.com/lwyuki/image/upload/v1623558987/static/img/illustration/%E5%85%AC%E8%BB%8A%E8%B3%87%E8%A8%8A1_sbn6tb.png'))
+                        message.append(ImageSendMessage(
+                            original_content_url='https://res.cloudinary.com/lwyuki/image/upload/v1623558987/static/img/illustration/%E5%85%AC%E8%BB%8A%E8%B3%87%E8%A8%8A2_p6ebqu.png', 
+                            preview_image_url='https://res.cloudinary.com/lwyuki/image/upload/v1623558987/static/img/illustration/%E5%85%AC%E8%BB%8A%E8%B3%87%E8%A8%8A2_p6ebqu.png'))
+                        line_bot_api.reply_message(event.reply_token, message)
+                    except:
+                        line_bot_api.reply_message (event.reply_token, TextSendMessage(text='發生錯誤!'))
+                if backdata.get('illuUbike') == 'True':
+                    try:
+                        message = ImageSendMessage(
+                            original_content_url='https://res.cloudinary.com/lwyuki/image/upload/v1623558993/static/img/illustration/Ubike%E8%B3%87%E8%A8%8A_sifnom.png', 
+                            preview_image_url='https://res.cloudinary.com/lwyuki/image/upload/v1623558993/static/img/illustration/Ubike%E8%B3%87%E8%A8%8A_sifnom.png')
+                        line_bot_api.reply_message(event.reply_token, message)
+                    except:
+                        line_bot_api.reply_message (event.reply_token, TextSendMessage(text='發生錯誤!'))
+                if backdata.get('illuCamp') == 'True':
+                    try:
+                        message = ImageSendMessage(
+                            original_content_url='https://res.cloudinary.com/lwyuki/image/upload/v1623558994/static/img/illustration/%E6%A0%A1%E5%9C%92%E5%9C%B0%E5%9C%96_qhywm2.png', 
+                            preview_image_url='https://res.cloudinary.com/lwyuki/image/upload/v1623558994/static/img/illustration/%E6%A0%A1%E5%9C%92%E5%9C%B0%E5%9C%96_qhywm2.png')
+                        line_bot_api.reply_message(event.reply_token, message)
+                    except:
+                        line_bot_api.reply_message (event.reply_token, TextSendMessage(text='發生錯誤!'))
+
             
         return HttpResponse()
     else:
