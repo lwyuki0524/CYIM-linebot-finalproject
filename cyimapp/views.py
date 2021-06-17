@@ -111,7 +111,7 @@ def foodArea(event):
             "contents": columns
         }
         message = FlexSendMessage(alt_text="test",contents=message)
-        print(message)
+        #print(message)
         #傳回5個最近的店家
         line_bot_api.reply_message(event.reply_token,message)
     return None
@@ -150,7 +150,7 @@ def randomFood(event):
     #從物件中一一取出fTag來比對使用者的文字
     for food_item in food_entry_list:  
         if food_item.fTag in event.message.text:
-            print(event.message.text +" find "+ food_item.fTag)
+            #print(event.message.text +" find "+ food_item.fTag)
             filter_text = food_item.fTag
     unit = foodTable.objects.filter( fTag = filter_text ) #過濾資料
     
