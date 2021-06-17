@@ -10,7 +10,7 @@ sched = BlockingScheduler()
 def timed_job():
     print('This job is run every one minutes.')
 """
-@sched.scheduled_job('cron', day_of_week='mon-fri', hour='6-23', minute='*/10')
+@sched.scheduled_job('cron', hour='6-23', minute='*/10')#, day_of_week='mon-fri'
 def scheduled_job():
     print('This job runs every day */10 min.')
     # 利用datetime查詢時間
